@@ -29,6 +29,9 @@ const Template: Story<Props> = args => <Editor {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
+  onChange: (getValue, getJson) => {
+    console.log("on change: ", "\n", getValue(), "\n", getJson());
+  },
   defaultValue: `# Welcome
 
 Just an easy to use **Markdown** editor with \`slash commands\``,

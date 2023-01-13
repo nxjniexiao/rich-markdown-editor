@@ -30,6 +30,7 @@ import TableRow from "./nodes/TableRow";
 import Bold from "./marks/Bold";
 import Code from "./marks/Code";
 import Highlight from "./marks/Highlight";
+import Color from "./marks/Color";
 import Italic from "./marks/Italic";
 import Link from "./marks/Link";
 import Strikethrough from "./marks/Strikethrough";
@@ -61,6 +62,7 @@ const extensions = new ExtensionManager([
   new Bold(),
   new Code(),
   new Highlight(),
+  new Color(),
   new Italic(),
   new Link(),
   new Strikethrough(),

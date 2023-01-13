@@ -59,6 +59,7 @@ import TableRow from "./nodes/TableRow";
 import Bold from "./marks/Bold";
 import Code from "./marks/Code";
 import Highlight from "./marks/Highlight";
+import Color from "./marks/Color";
 import Italic from "./marks/Italic";
 import Link from "./marks/Link";
 import Strikethrough from "./marks/Strikethrough";
@@ -139,7 +140,7 @@ export type Props = {
   onFocus?: () => void;
   onSave?: ({ done: boolean }) => void;
   onCancel?: () => void;
-  onChange?: (value: () => string) => void;
+  onChange?: (value: () => string, json: () => { [key: string]: any }) => void;
   onImageUploadStart?: () => void;
   onImageUploadStop?: () => void;
   onCreateLink?: (title: string) => Promise<string>;
@@ -360,6 +361,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           new Bold(),
           new Code(),
           new Highlight(),
+          new Color(),
           new Italic(),
           new TemplatePlaceholder(),
           new Underline(),
@@ -606,12 +608,19 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     return this.serializer.serialize(this.view.state.doc);
   };
 
+  json = (): { [key: string]: any } => {
+    return this.view.state.toJSON();
+  };
+
   handleChange = () => {
     if (!this.props.onChange) return;
 
-    this.props.onChange(() => {
-      return this.value();
-    });
+    this.props.onChange(
+      () => {
+        return this.value();
+      },
+      () => this.json()
+    );
   };
 
   handleSave = () => {

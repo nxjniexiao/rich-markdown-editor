@@ -62,6 +62,14 @@ export default function formattingMenuItems(
       visible: !isTemplate,
     },
     {
+      name: "color",
+      tooltip: "修改颜色",
+      icon: HighlightIcon,
+      active: isMarkActive(schema.marks.highlight),
+      visible: !isTemplate,
+      attrs: { color: "red" },
+    },
+    {
       name: "code_inline",
       tooltip: dictionary.codeInline,
       icon: CodeIcon,
