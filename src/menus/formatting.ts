@@ -19,6 +19,7 @@ import isMarkActive from "../queries/isMarkActive";
 import isNodeActive from "../queries/isNodeActive";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
+import ColorButton from "../components/ColorButton";
 
 export default function formattingMenuItems(
   state: EditorState,
@@ -62,12 +63,10 @@ export default function formattingMenuItems(
       visible: !isTemplate,
     },
     {
-      name: "color",
-      tooltip: "修改颜色",
-      icon: HighlightIcon,
-      active: isMarkActive(schema.marks.highlight),
+      name: "custom",
+      tooltip: "文字颜色",
+      icon: ColorButton,
       visible: !isTemplate,
-      attrs: { color: "red" },
     },
     {
       name: "code_inline",

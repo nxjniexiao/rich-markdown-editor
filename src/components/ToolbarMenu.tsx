@@ -33,6 +33,9 @@ class ToolbarMenu extends React.Component<Props> {
           if (item.visible === false || !item.icon) {
             return null;
           }
+          if (item.name === "custom") {
+            return <item.icon key={index} item={item} {...this.props} />;
+          }
           const Icon = item.icon;
           const isActive = item.active ? item.active(state) : false;
 

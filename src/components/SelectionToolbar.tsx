@@ -199,6 +199,7 @@ export default class SelectionToolbar extends React.Component<Props> {
 
     // Some extensions may be disabled, remove corresponding items
     items = items.filter(item => {
+      if (item.name === "custom") return true;
       if (item.name === "separator") return true;
       if (item.name && !this.props.commands[item.name]) return false;
       return true;
