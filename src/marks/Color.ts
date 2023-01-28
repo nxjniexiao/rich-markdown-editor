@@ -51,7 +51,7 @@ export default class Color extends Mark {
   }
 
   commands({ type }) {
-    return ({ color }) => {
+    return ({ color } = { color: "currentColor" }) => {
       console.log("color: ", color); // TODO: remove
       return toggleMark(type, { color });
     };
