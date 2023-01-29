@@ -32,6 +32,21 @@ function ColorPanel(props: Props) {
     "rgb(233, 30, 44)",
   ];
 
+  const backgroundColors = [
+    "transparent",
+    "rgba(140, 140, 140, 0.12)",
+    "rgba(92, 92, 92, 0.2)",
+    "rgba(163, 67, 31, 0.2)",
+    "rgba(240, 107, 5, 0.2)",
+    "rgba(240, 200, 0, 0.2)",
+    "rgba(3, 135, 102, 0.2)",
+    "rgba(5, 117, 197, 0.2)",
+    "rgba(74, 82, 199, 0.2)",
+    "rgba(136, 49, 204, 0.2)",
+    "rgba(200, 21, 182, 0.2)",
+    "rgba(233, 30, 44, 0.2)",
+  ];
+
   if (!active) return null;
 
   return (
@@ -48,6 +63,31 @@ function ColorPanel(props: Props) {
             A
           </span>
         ))}
+      </div>
+      <div className="title">背景颜色</div>
+      <div className="color-container">
+        {backgroundColors.map(backgroundColor => {
+          let style: React.CSSProperties = {
+            backgroundColor,
+          };
+          if (backgroundColor === "transparent") {
+            style = {
+              backgroundColor: "transparent",
+              backgroundImage: `linear-gradient(45deg, rgba(0, 0, 0, .25) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, .25) 0), linear-gradient(45deg, rgba(0, 0, 0, .25) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, .25) 0)`,
+              backgroundPosition: "0 0, 6px 6px",
+              backgroundSize: "12px 12px",
+            };
+          }
+
+          return (
+            <span
+              className="color bg"
+              key={backgroundColor}
+              style={style}
+              onClick={() => commands.backgroundColor({ backgroundColor })}
+            ></span>
+          );
+        })}
       </div>
     </ColorPanelDiv>
   );
@@ -75,11 +115,15 @@ const ColorPanelDiv = styled.div`
       margin: 6px;
       width: 24px;
       line-height: 24px;
+      height: 24px;
       border-radius: 2px;
       text-align: center;
       cursor: pointer;
-      &:hover {
+      &:not(.bg):hover {
         background: rgba(1, 1, 1, 0.1);
+      }
+      &.bg:hover {
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
       }
     }
   }

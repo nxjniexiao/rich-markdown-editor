@@ -1,37 +1,40 @@
 import { setMark } from "../commands/setMark";
 import Mark from "./Mark";
 
-export default class Color extends Mark {
+export default class BackgroundColor extends Mark {
   get name() {
-    return "color";
+    return "backgroundColor";
   }
 
   get schema() {
     return {
       attrs: {
-        color: {
-          default: "currentColor",
+        backgroundColor: {
+          default: "",
         },
       },
       parseDOM: [
         {
           tag: "span",
-          style: "color",
+          style: "backgroundColor",
           getAttrs: value => {
             return {
-              color: value.color,
+              backgroundColor: value.backgroundColor,
             };
           },
         },
       ],
-      toDOM: node => ["span", { style: `color: ${node.attrs.color}` }],
+      toDOM: node => [
+        "span",
+        { style: `background-color: ${node.attrs.backgroundColor}` },
+      ],
     };
   }
 
   get toMarkdown() {
     return {
       open(_state, _mark) {
-        return `<span style="color: ${_mark.attrs.color}">`;
+        return `<span style="background-color: ${_mark.attrs.backgroundColor}">`;
       },
       close: "</span>",
       mixable: true,
@@ -41,7 +44,7 @@ export default class Color extends Mark {
 
   // TODO:
   parseMarkdown() {
-    const newLocal = "color";
+    const newLocal = "backgroundColor";
     return {
       mark: newLocal,
       getAttrs: tok => ({
@@ -52,8 +55,8 @@ export default class Color extends Mark {
   }
 
   commands({ type }) {
-    return ({ color } = { color: "currentColor" }) => {
-      return setMark(type, { color });
+    return ({ backgroundColor } = { backgroundColor: "" }) => {
+      return setMark(type, { backgroundColor });
     };
   }
 }
