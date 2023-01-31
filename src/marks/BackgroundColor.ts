@@ -15,11 +15,10 @@ export default class BackgroundColor extends Mark {
       },
       parseDOM: [
         {
-          tag: "span",
-          style: "backgroundColor",
+          style: "background-color",
           getAttrs: value => {
             return {
-              backgroundColor: value.backgroundColor,
+              backgroundColor: value, // fix: 粘贴时背景颜色会丢失
             };
           },
         },

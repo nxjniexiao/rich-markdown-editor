@@ -1,5 +1,6 @@
 import { setMark } from "../commands/setMark";
 import Mark from "./Mark";
+import colorRule from "../rules/color";
 
 export default class Color extends Mark {
   get name() {
@@ -15,11 +16,10 @@ export default class Color extends Mark {
       },
       parseDOM: [
         {
-          tag: "span",
           style: "color",
           getAttrs: value => {
             return {
-              color: value.color,
+              color: value, // fix: 粘贴时文字颜色会丢失
             };
           },
         },
@@ -28,26 +28,29 @@ export default class Color extends Mark {
     };
   }
 
+  // markdown-it 解析 markdown 时使用
+  get rulePlugins() {
+    return [colorRule];
+  }
+
   get toMarkdown() {
     return {
       open(_state, _mark) {
-        return `<span style="color: ${_mark.attrs.color}">`;
+        return `<<${_mark.attrs.color} `;
       },
-      close: "</span>",
+      close: ">>",
       mixable: true,
       expelEnclosingWhitespace: true,
     };
   }
 
-  // TODO:
+  // 把 markdown-it 的解析结果转换成 mark
   parseMarkdown() {
-    const newLocal = "color";
     return {
-      mark: newLocal,
-      getAttrs: tok => ({
-        color: tok.attrGet("href"),
-        title: tok.attrGet("title") || null,
-      }),
+      mark: "color",
+      getAttrs: tok => {
+        return { color: tok.attrGet("color") };
+      },
     };
   }
 

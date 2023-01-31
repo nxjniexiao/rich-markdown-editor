@@ -37,6 +37,23 @@ Default.args = {
 Just an easy to use **Markdown** editor with \`slash commands\``,
 };
 
+export const Color = Template.bind({});
+Color.args = {
+  onChange: (getValue, getJson) => {
+    console.log("on change: ", "\n", getValue(), "\n", getJson());
+  },
+  defaultValue: `
+# 文字颜色
+
+可以使用 \`<<\` 后跟颜色来给文字添加颜色，颜色支持十六进制、rgb、rgba三种格式：
+<<#f00 红色>><<rgb(0, 255, 255) 青色>><<rgba(255, 0, 255, 0.2) 紫色>>
+Markdown:
+\`\`\`
+<<#f00 红色>><<rgb(0, 255, 255) 青色>><<rgba(255, 0, 255, 0.2) 紫色>>
+\`\`\`
+  `,
+};
+
 export const Emoji = Template.bind({});
 Emoji.args = {
   defaultValue: `# Emoji
