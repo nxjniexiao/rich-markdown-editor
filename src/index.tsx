@@ -80,6 +80,7 @@ import TrailingNode from "./plugins/TrailingNode";
 import PasteHandler from "./plugins/PasteHandler";
 import { PluginSimple } from "markdown-it";
 import InlineMath from "./nodes/InlineMath";
+import Math from "./nodes/Math";
 
 export { schema, parser, serializer, renderToHtml } from "./server";
 
@@ -364,6 +365,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           new Code(),
           new Highlight(),
           new Color(),
+          new Math(),
           new InlineMath(),
           new BackgroundColor(),
           new Italic(),

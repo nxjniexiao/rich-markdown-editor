@@ -233,7 +233,3 @@ export class MathView implements NodeView {
     this.dom.classList.remove("editing");
   }
 }
-
-export function InlineMathView(node: Node, view: EditorView, getPos: GetPos) {
-  return new MathView(node, view, getPos, true);
-}
