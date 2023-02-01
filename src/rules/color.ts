@@ -55,6 +55,11 @@ export default function markdownItColor(md: MarkdownIt): void {
                 newTokens.push(colorOpenToken, colorTextToken, colorCloseToken);
                 start = reg.lastIndex;
               }
+              if (start > 0 && start < current.content.length) {
+                const textToken = new Token("text", "", 0);
+                textToken.content = current.content.slice(start);
+                newTokens.push(textToken);
+              }
               if (newTokens.length > 0) {
                 tokenChildren.splice(j, 1, ...newTokens);
               }
