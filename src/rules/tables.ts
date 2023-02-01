@@ -19,12 +19,18 @@ export default function markdownTables(md: MarkdownIt): void {
         const existing = tokens[i].children || [];
         tokens[i].children = [];
 
-        existing.forEach(child => {
+        existing.forEach((child, idx) => {
           const breakParts = child.content.split(BREAK_REGEX);
 
+          // Exclude the token that is text content of math
+          const isMathText = existing[idx + 1]?.type === "inline_math_close";
           // a schema agnostic way to know if a node is inline code would be
           // great, for now we are stuck checking the node type.
-          if (breakParts.length > 1 && child.type !== "code_inline") {
+          if (
+            breakParts.length > 1 &&
+            child.type !== "code_inline" &&
+            !isMathText
+          ) {
             breakParts.forEach((part, index) => {
               const token = new Token("text", "", 1);
               token.content = part.trim();

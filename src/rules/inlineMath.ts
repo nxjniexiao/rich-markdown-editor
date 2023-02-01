@@ -1,7 +1,7 @@
 import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token";
 
-const INLINE_MATH_REGEX = /\$([^$]*)\$(?!\d)/;
+const INLINE_MATH_REGEX = /\$([^$]+)\$(?![\d\$])/;
 
 export default function markdownItInlineMath(md: MarkdownIt): void {
   // insert a new rule after the "inline" rules are parsed
@@ -48,6 +48,11 @@ export default function markdownItInlineMath(md: MarkdownIt): void {
                   inlineMathCloseToken
                 );
                 start = reg.lastIndex;
+              }
+              if (start > 0 && start < current.content.length) {
+                const textToken = new Token("text", "", 0);
+                textToken.content = current.content.slice(start);
+                newTokens.push(textToken);
               }
               if (newTokens.length > 0) {
                 tokenChildren.splice(j, 1, ...newTokens);
