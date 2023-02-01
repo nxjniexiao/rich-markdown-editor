@@ -1,0 +1,239 @@
+import { Node } from "prosemirror-model";
+import { EditorView, NodeView } from "prosemirror-view";
+import { StepMap } from "prosemirror-transform";
+import { EditorState, TextSelection, Transaction } from "prosemirror-state";
+import { keymap } from "prosemirror-keymap";
+import { undo, redo } from "prosemirror-history";
+import { chainCommands, deleteSelection } from "prosemirror-commands";
+import { GetPos, isMacOS } from "./types";
+
+import "katex/dist/katex.css";
+import "./style.css";
+
+export async function renderMath(
+  math: string,
+  element: HTMLElement,
+  inline: boolean
+) {
+  // TODO: Change this to a Text call that includes the document, allows inclusion of displays! :)
+  // const txt = toText(this.node, this.outerView.state.schema, document);
+  // console.log({ math, txt });
+  // const render = math.replace(/−/g, '-');
+  const render = math?.trim() || "...";
+  try {
+    const katex = await import("katex");
+    katex.default.render(render, element, {
+      displayMode: !inline,
+      throwOnError: false,
+      macros: {
+        "\\boldsymbol": "\\mathbf",
+      },
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-param-reassign
+    element.innerText = error as string;
+  }
+}
+
+export class MathView implements NodeView {
+  dom: HTMLElement;
+
+  mathEditor: HTMLElement;
+
+  mathContent: HTMLElement;
+
+  inline: boolean;
+
+  // These are used when the footnote is selected
+  innerView: EditorView;
+
+  node: Node;
+
+  outerView: EditorView;
+
+  getPos: GetPos;
+
+  constructor(node: Node, view: EditorView, getPos: GetPos, inline: boolean) {
+    this.node = node;
+    this.outerView = view;
+    this.getPos = getPos;
+    this.dom = document.createElement(inline ? "span" : "div");
+    this.dom.classList.add("math");
+
+    this.mathEditor = document.createElement(inline ? "span" : "div");
+    this.mathEditor.classList.add("math-editor");
+    this.mathContent = document.createElement(inline ? "span" : "div");
+    this.mathContent.classList.add("math-content");
+    this.mathContent.addEventListener("click", () => this.selectNode());
+    this.dom.appendChild(this.mathEditor);
+    this.dom.appendChild(this.mathContent);
+    this.inline = inline;
+
+    if (this.inline) {
+      this.dom.classList.add("inline");
+      this.mathEditor.classList.add("inline");
+    } else {
+      this.dom.classList.add("display");
+    }
+
+    this.addFakeCursor();
+    this.dom.classList.remove("editing");
+    this.renderMath();
+
+    const unFocus = () => {
+      this.dom.classList.remove("editing");
+      this.outerView.focus();
+      return true;
+    };
+
+    const mac = isMacOS();
+
+    this.innerView = new EditorView(
+      { mount: this.mathEditor },
+      {
+        state: EditorState.create({
+          doc: this.node,
+          plugins: [
+            keymap({
+              "Mod-a": () => {
+                const { doc, tr } = this.innerView.state;
+                const sel = TextSelection.create(
+                  doc,
+                  0,
+                  this.node.nodeSize - 2
+                );
+                this.innerView.dispatch(tr.setSelection(sel));
+                return true;
+              },
+              "Mod-z": () =>
+                undo(this.outerView.state, this.outerView.dispatch),
+              "Mod-Z": () =>
+                redo(this.outerView.state, this.outerView.dispatch),
+              ...(mac
+                ? {}
+                : {
+                    "Mod-y": () =>
+                      redo(this.outerView.state, this.outerView.dispatch),
+                  }),
+              Escape: unFocus,
+              Tab: unFocus,
+              "Shift-Tab": unFocus,
+              Enter: unFocus,
+
+              Backspace: chainCommands(deleteSelection, state => {
+                // default backspace behavior for non-empty selections
+                if (!state.selection.empty) {
+                  return false;
+                }
+                // default backspace behavior when math node is non-empty
+                if (this.node.textContent.length > 0) {
+                  return false;
+                }
+                // otherwise, we want to delete the empty math node and focus the outer view
+                this.outerView.dispatch(this.outerView.state.tr.insertText(""));
+                this.outerView.focus();
+                return true;
+              }),
+            }),
+          ],
+        }),
+
+        dispatchTransaction: this.dispatchInner.bind(this),
+        handleDOMEvents: {
+          mousedown: () => {
+            // Kludge to prevent issues due to the fact that the whole
+            // footnote is node-selected (and thus DOM-selected) when
+            // the parent editor is focused.
+            if (this.outerView.hasFocus()) this.innerView.focus();
+            return false;
+          },
+        },
+      }
+    );
+  }
+
+  update(node: Node) {
+    if (!node.sameMarkup(this.node)) return false;
+    this.node = node;
+    this.addFakeCursor();
+    if (this.innerView) {
+      const { state } = this.innerView;
+      const start = node.content.findDiffStart(state.doc.content);
+      if (start != null) {
+        const ends = node.content.findDiffEnd(state.doc.content as any);
+        let { a: endA, b: endB } = ends ?? { a: 0, b: 0 };
+        const overlap = start - Math.min(endA, endB);
+        if (overlap > 0) {
+          endA += overlap;
+          endB += overlap;
+        }
+        this.innerView.dispatch(
+          state.tr
+            .replace(start, endB, node.slice(start, endA))
+            .setMeta("fromOutside", true)
+        );
+      }
+    }
+    this.renderMath();
+    return true;
+  }
+
+  dispatchInner(tr: Transaction) {
+    const { state, transactions } = this.innerView.state.applyTransaction(tr);
+    this.innerView.updateState(state);
+
+    if (!tr.getMeta("fromOutside")) {
+      const outerTr = this.outerView.state.tr;
+      const offsetMap = StepMap.offset(this.getPos() + 1);
+      for (let i = 0; i < transactions.length; i += 1) {
+        const { steps } = transactions[i];
+        for (let j = 0; j < steps.length; j += 1)
+          outerTr.step(steps[j].map(offsetMap) as any);
+      }
+      if (outerTr.docChanged) {
+        this.outerView.dispatch(outerTr);
+      }
+    }
+  }
+
+  renderMath() {
+    renderMath(this.node.textContent, this.mathContent, this.inline);
+  }
+
+  destroy() {
+    this.innerView.destroy();
+    this.dom.textContent = "";
+  }
+
+  stopEvent(event: any): boolean {
+    return (
+      (this.innerView && this.innerView.dom.contains(event.target)) ?? false
+    );
+  }
+
+  ignoreMutation() {
+    return true;
+  }
+
+  addFakeCursor() {
+    if (!this.inline) return;
+    const hasContent = this.node.textContent.length > 0;
+    this.mathEditor.classList[hasContent ? "remove" : "add"]("empty");
+  }
+
+  selectNode() {
+    this.dom.classList.add("ProseMirror-selectedNode");
+    this.dom.classList.add("editing");
+    // This is necessary on first insert.
+    setTimeout(() => this.innerView.focus(), 1);
+  }
+
+  deselectNode() {
+    this.dom.classList.remove("ProseMirror-selectedNode");
+    this.dom.classList.remove("editing");
+  }
+}
+
+export function InlineMathView(node: Node, view: EditorView, getPos: GetPos) {
+  return new MathView(node, view, getPos, true);
+}

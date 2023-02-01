@@ -1,0 +1,65 @@
+.ProseMirror-hideselection .math-editor *::selection {
+  background-color: transparent;
+}
+.ProseMirror-hideselection .math-editor *::-moz-selection {
+  background-color: transparent;
+}
+.katex-display {
+  margin: 0.5em;
+  padding: 5px;
+}
+
+.math-content {
+  overflow: hidden;
+}
+.math.editing .math-content {
+  display: none;
+}
+.math .math-editor {
+  display: none;
+}
+.math.editing .math-editor {
+  width: 100%;
+  display: inline-block;
+}
+.math.inline.editing .math-editor {
+  display: inline;
+}
+
+.math-editor.ProseMirror {
+  cursor: auto;
+  font-family: monospace;
+  color: purple;
+}
+.math-editor::before,
+.math-editor::after {
+  content: '$$';
+  color: #aaa;
+  display: block;
+}
+.math-editor.inline::before,
+.math-editor.inline::after {
+  content: '$';
+  display: inline;
+}
+
+.math-editor.inline:empty:before {
+  border-right-width: 1px;
+  border-right-style: solid;
+  animation: blinkCursor 1s;
+  animation-iteration-count: infinite;
+}
+@keyframes blinkCursor {
+  0% {
+    border-color: purple;
+  }
+  49% {
+    border-color: purple;
+  }
+  50% {
+    border-color: #fff;
+  }
+  99% {
+    border-color: #fff;
+  }
+}

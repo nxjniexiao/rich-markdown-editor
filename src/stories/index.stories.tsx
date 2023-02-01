@@ -54,6 +54,18 @@ Markdown:
   `,
 };
 
+export const Math = Template.bind({});
+Math.args = {
+  onChange: (getValue, getJson) => {
+    console.log("on change: ", "\n", getValue(), "\n", getJson());
+  },
+  defaultValue: `
+# 公式
+
+行内公式 $a+b=c$ ，使用 $ 包裹。
+`,
+};
+
 export const Emoji = Template.bind({});
 Emoji.args = {
   defaultValue: `# Emoji
