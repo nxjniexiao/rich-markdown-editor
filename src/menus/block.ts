@@ -15,6 +15,7 @@ import {
   WarningIcon,
   InfoIcon,
   LinkIcon,
+  MathIcon,
 } from "outline-icons";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
@@ -94,6 +95,12 @@ export default function blockMenuItems(
       icon: CodeIcon,
       shortcut: "^ ⇧ \\",
       keywords: "script",
+    },
+    {
+      name: "math",
+      title: "公式",
+      icon: MathIcon,
+      keywords: "math",
     },
     {
       name: "hr",

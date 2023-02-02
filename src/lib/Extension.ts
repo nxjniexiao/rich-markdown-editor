@@ -4,7 +4,7 @@ import { Plugin } from "prosemirror-state";
 import Editor from "../";
 import { PluginSimple } from "markdown-it";
 
-type Command = (attrs) => (state, dispatch) => any;
+type Command = (attrs) => (state, dispatch, view) => any;
 
 export default class Extension {
   options: Record<string, any>;

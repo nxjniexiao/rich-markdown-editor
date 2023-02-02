@@ -1,6 +1,8 @@
-import { Plugin } from "prosemirror-state";
+import { NodeSelection, Plugin } from "prosemirror-state";
+import { setBlockType } from "prosemirror-commands";
 import { InputRule } from "prosemirror-inputrules";
 import { changeNodeRule } from "../inputrules/utils";
+import isNodeActive from "../queries/isNodeActive";
 import { MathView } from "../node-views/math-view";
 import MathRule from "../rules/math";
 import Node from "./Node";
@@ -19,6 +21,10 @@ export default class InlineMath extends Node {
       parseDom: [{ tag: "math" }],
       toDom: () => ["math", {}, 0],
     };
+  }
+
+  commands({ type /*, schema*/ }) {
+    return attrs => setBlockTypeThenFocus(type, attrs);
   }
 
   inputRules({ type /*, schema*/ }): InputRule[] {
@@ -59,4 +65,24 @@ export default class InlineMath extends Node {
       block: "math",
     };
   }
+}
+
+export function setBlockTypeThenFocus(type, attrs = {}) {
+  return (state, dispatch, view) => {
+    const isActive = isNodeActive(type, attrs)(state);
+
+    if (isActive) return false;
+
+    const ret = setBlockType(type, attrs)(state, dispatch);
+    if (ret) {
+      // 选中此 block
+      const tr = view.state.tr;
+      dispatch(
+        tr.setSelection(
+          NodeSelection.create(tr.doc, tr.selection.$from.before())
+        )
+      );
+    }
+    return ret;
+  };
 }

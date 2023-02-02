@@ -11,6 +11,7 @@ import {
   TodoListIcon,
   InputIcon,
   HighlightIcon,
+  MathIcon,
 } from "outline-icons";
 import { isInTable } from "prosemirror-tables";
 import { EditorState } from "prosemirror-state";
@@ -73,6 +74,12 @@ export default function formattingMenuItems(
       tooltip: dictionary.codeInline,
       icon: CodeIcon,
       active: isMarkActive(schema.marks.code_inline),
+    },
+    {
+      name: "inline_math",
+      tooltip: "行内公式",
+      icon: MathIcon,
+      active: isNodeActive(schema.nodes.inline_math),
     },
     {
       name: "separator",
