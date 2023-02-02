@@ -1,4 +1,6 @@
 import { Plugin } from "prosemirror-state";
+import { InputRule } from "prosemirror-inputrules";
+import { changeNodeRule } from "../inputrules/utils";
 import { MathView } from "../node-views/math-view";
 import MathRule from "../rules/math";
 import Node from "./Node";
@@ -17,6 +19,10 @@ export default class InlineMath extends Node {
       parseDom: [{ tag: "math" }],
       toDom: () => ["math", {}, 0],
     };
+  }
+
+  inputRules({ type /*, schema*/ }): InputRule[] {
+    return [changeNodeRule(/^\$\$$/, type)];
   }
 
   get plugins() {
