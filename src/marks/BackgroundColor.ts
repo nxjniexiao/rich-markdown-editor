@@ -1,4 +1,5 @@
 import { setMark } from "../commands/setMark";
+import markdownItBackgroundColor from "../rules/backgroundColor";
 import Mark from "./Mark";
 
 export default class BackgroundColor extends Mark {
@@ -30,25 +31,28 @@ export default class BackgroundColor extends Mark {
     };
   }
 
+  // markdown-it 解析 markdown 时使用
+  get rulePlugins() {
+    return [markdownItBackgroundColor];
+  }
+
   get toMarkdown() {
     return {
       open(_state, _mark) {
-        return `<span style="background-color: ${_mark.attrs.backgroundColor}">`;
+        return `<<<${_mark.attrs.backgroundColor} `;
       },
-      close: "</span>",
+      close: ">>>",
       mixable: true,
       expelEnclosingWhitespace: true,
     };
   }
 
-  // TODO:
+  // 把 markdown-it 的解析结果转换成 mark
   parseMarkdown() {
-    const newLocal = "backgroundColor";
     return {
-      mark: newLocal,
+      mark: "backgroundColor",
       getAttrs: tok => ({
-        color: tok.attrGet("href"),
-        title: tok.attrGet("title") || null,
+        backgroundColor: tok.attrGet("backgroundColor"),
       }),
     };
   }

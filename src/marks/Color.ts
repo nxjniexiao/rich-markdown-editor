@@ -29,9 +29,9 @@ export default class Color extends Mark {
   }
 
   // markdown-it 解析 markdown 时使用
-  get rulePlugins() {
-    return [colorRule];
-  }
+  // get rulePlugins() {
+  //   return [colorRule];
+  // }
 
   get toMarkdown() {
     return {
