@@ -2,7 +2,7 @@ import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token";
 
 export default function markdownItBackgroundColor(md: MarkdownIt): void {
-  function render(tokens, idx) {
+  function renderColor(tokens, idx) {
     const token = tokens[idx];
     const color = token.attrGet("color");
 
@@ -15,8 +15,23 @@ export default function markdownItBackgroundColor(md: MarkdownIt): void {
     }
   }
 
-  md.renderer.rules.color_open = render;
-  md.renderer.rules.color_close = render;
+  function renderBackgroundColor(tokens, idx) {
+    const token = tokens[idx];
+    const backgroundColor = token.attrGet("backgroundColor");
+
+    if (token.nesting === 1) {
+      // opening tag
+      return `<span style="background-color: ${backgroundColor}">`;
+    } else {
+      // closing tag
+      return "</span>";
+    }
+  }
+
+  md.renderer.rules.color_open = renderColor;
+  md.renderer.rules.color_close = renderColor;
+  md.renderer.rules.backgroundColor_open = renderBackgroundColor;
+  md.renderer.rules.backgroundColor_close = renderBackgroundColor;
 
   // insert a new rule after the "inline" rules are parsed
   md.core.ruler.after("inline", "backgroundColor", state => {

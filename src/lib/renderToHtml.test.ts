@@ -152,3 +152,11 @@ test("renders ordered list", () => {
 2. item two`)
   ).toMatchSnapshot();
 });
+
+test("renders color", () => {
+  expect(
+    renderToHtml(
+      "<<rgb(240, 107, 5) <<<rgba(163, 67, 31, 0.2) 测试>>>>><<rgb(136, 49, 204) <<<rgba(74, 82, 199, 0.2) 文字>>>>><<rgb(233, 30, 44) <<<rgba(200, 21, 182, 0.2) 背景>>>>><<rgb(3, 135, 102) <<<rgba(3, 135, 102, 0.2) 颜色>>>>>"
+    )
+  ).toMatchSnapshot();
+});
