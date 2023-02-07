@@ -1,9 +1,38 @@
+import katex from "katex";
 import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token";
 
 const MATH_REGEX = /\$\$([^$]*)\$\$/;
 
-export default function markdownItInlineMath(md: MarkdownIt): void {
+export default function markdownItMath(md: MarkdownIt): void {
+  function render(tokens, idx) {
+    const token = tokens[idx];
+
+    if (token.nesting === 1) {
+      // opening tag
+      return `<p>`;
+    } else {
+      // closing tag
+      return "</p>";
+    }
+  }
+
+  md.renderer.rules.math_open = render;
+  md.renderer.rules.math_close = render;
+
+  // 修改公式文字的渲染方法
+  const renderText = md.renderer.rules.text;
+  md.renderer.rules.text = function(tokens, idx, ...rest) {
+    const prevTokenType = tokens[idx - 1]?.type;
+    if (prevTokenType === "math_open" || prevTokenType === "inline_math_open") {
+      return katex.renderToString(tokens[idx].content, {
+        displayMode: prevTokenType === "math_open",
+      });
+    } else {
+      return renderText?.(tokens, idx, ...rest);
+    }
+  };
+
   // insert a new rule after the "block" rules are parsed
   md.core.ruler.after("block", "math", state => {
     const tokens = state.tokens;

@@ -4,6 +4,21 @@ import Token from "markdown-it/lib/token";
 const INLINE_MATH_REGEX = /\$([^$]+)\$(?![\d\$])/;
 
 export default function markdownItInlineMath(md: MarkdownIt): void {
+  function render(tokens, idx) {
+    const token = tokens[idx];
+
+    if (token.nesting === 1) {
+      // opening tag
+      return ``;
+    } else {
+      // closing tag
+      return "";
+    }
+  }
+
+  md.renderer.rules.inline_math_open = render;
+  md.renderer.rules.inline_math_close = render;
+
   // insert a new rule after the "inline" rules are parsed
   md.core.ruler.after("inline", "inline_math", state => {
     const tokens = state.tokens;

@@ -8,6 +8,8 @@ import tablesRule from "../rules/tables";
 import noticesRule from "../rules/notices";
 import underlinesRule from "../rules/underlines";
 import emojiRule from "../rules/emoji";
+import inlineMathRule from "../rules/inlineMath";
+import mathRule from "../rules/math";
 import BackgroundColorRule from "../rules/backgroundColor";
 
 const defaultRules = [
@@ -20,6 +22,8 @@ const defaultRules = [
   tablesRule,
   noticesRule,
   emojiRule,
+  inlineMathRule,
+  mathRule,
   BackgroundColorRule,
 ];
 
