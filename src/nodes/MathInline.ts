@@ -1,12 +1,11 @@
 import { EditorState, Plugin, Transaction } from "prosemirror-state";
 import { InputRule } from "prosemirror-inputrules";
 import { MathView } from "../node-views/math-view";
-import inlineMathRule from "../rules/inlineMath";
 import Node from "./Node";
 
 export default class InlineMath extends Node {
   get name() {
-    return "inline_math";
+    return "math_inline";
   }
 
   get schema() {
@@ -70,7 +69,7 @@ export default class InlineMath extends Node {
       new Plugin({
         props: {
           nodeViews: {
-            inline_math: (node, view, getPos: () => number) =>
+            math_inline: (node, view, getPos: () => number) =>
               new MathView(node, view, getPos, true),
           },
         },
@@ -86,9 +85,9 @@ export default class InlineMath extends Node {
   }
 
   // markdown-it 解析 markdown 时使用
-  get rulePlugins() {
-    return [inlineMathRule];
-  }
+  // get rulePlugins() {
+  //   return [inlineMathRule];
+  // }
 
   // 把 markdown-it 的解析结果转换成 node
   parseMarkdown() {
@@ -96,7 +95,7 @@ export default class InlineMath extends Node {
       // prosemirror-markdown 中 tokenHandlers 函数
       // 会根据 token 的类型生成 tokenHandler，
       // 类型有: block/node/mark/ignore.
-      block: "inline_math",
+      block: "math_inline",
     };
   }
 }

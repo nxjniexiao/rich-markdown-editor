@@ -4,12 +4,12 @@ import { InputRule } from "prosemirror-inputrules";
 import { changeNodeRule } from "../inputrules/utils";
 import isNodeActive from "../queries/isNodeActive";
 import { MathView } from "../node-views/math-view";
-import MathRule from "../rules/math";
+import MathRule from "../rules/katex";
 import Node from "./Node";
 
 export default class InlineMath extends Node {
   get name() {
-    return "math";
+    return "math_block";
   }
 
   get schema() {
@@ -37,7 +37,7 @@ export default class InlineMath extends Node {
       new Plugin({
         props: {
           nodeViews: {
-            math: (node, view, getPos: () => number) =>
+            math_block: (node, view, getPos: () => number) =>
               new MathView(node, view, getPos, false),
           },
         },
@@ -63,7 +63,7 @@ export default class InlineMath extends Node {
       // prosemirror-markdown 中 tokenHandlers 函数
       // 会根据 token 的类型生成 tokenHandler，
       // 类型有: block/node/mark/ignore.
-      block: "math",
+      block: "math_block",
     };
   }
 }

@@ -79,8 +79,8 @@ import SmartText from "./plugins/SmartText";
 import TrailingNode from "./plugins/TrailingNode";
 import PasteHandler from "./plugins/PasteHandler";
 import { PluginSimple } from "markdown-it";
-import InlineMath from "./nodes/InlineMath";
-import Math from "./nodes/Math";
+import MathInline from "./nodes/MathInline";
+import MathBlock from "./nodes/MathBlock";
 
 export { schema, parser, serializer, renderToHtml } from "./server";
 
@@ -365,8 +365,8 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           new Code(),
           new Highlight(),
           new Color(),
-          new Math(),
-          new InlineMath(),
+          new MathBlock(),
+          new MathInline(),
           new BackgroundColor(),
           new Italic(),
           new TemplatePlaceholder(),
