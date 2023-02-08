@@ -18,6 +18,7 @@ export default class InlineMath extends Node {
       content: "text*",
       inline: false,
       atom: true,
+      code: true,
       parseDom: [{ tag: "math" }],
       toDom: () => ["math", {}, 0],
     };
@@ -48,7 +49,7 @@ export default class InlineMath extends Node {
   toMarkdown(state, node) {
     state.write("$$");
     state.renderContent(node);
-    state.write("$$");
+    state.write("$$\n\n");
   }
 
   // markdown-it 解析 markdown 时使用

@@ -4,7 +4,7 @@ import { StepMap } from "prosemirror-transform";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { keymap } from "prosemirror-keymap";
 import { undo, redo } from "prosemirror-history";
-import { chainCommands, deleteSelection } from "prosemirror-commands";
+import { chainCommands, deleteSelection, newlineInCode } from "prosemirror-commands";
 import { GetPos, isMacOS } from "./types";
 
 import "katex/dist/katex.css";
@@ -119,6 +119,8 @@ export class MathView implements NodeView {
               Tab: unFocus,
               "Shift-Tab": unFocus,
               Enter: unFocus,
+              "Ctrl-Enter": chainCommands(newlineInCode, unFocus),
+              "Shift-Enter": chainCommands(newlineInCode, unFocus),
 
               Backspace: chainCommands(deleteSelection, state => {
                 // default backspace behavior for non-empty selections
