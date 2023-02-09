@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { EditorView } from "prosemirror-view";
-import { HighlightIcon } from "outline-icons";
+import { PaletteIcon } from "outline-icons";
 import ToolbarButton from "./ToolbarButton";
 import ColorPanel from "./ColorPanel";
 import theme from "../styles/theme";
@@ -29,7 +29,7 @@ function ColorButton(props: Props) {
         onClick={() => setActive(active => !active)}
       >
         <Tooltip tooltip={item.tooltip} placement="top">
-          <HighlightIcon color={theme.toolbarItem} />
+          <PaletteIcon color={theme.toolbarItem} />
         </Tooltip>
       </ToolbarButton>
       <ColorPanel ref={colorPanelRef} active={active} {...props} />

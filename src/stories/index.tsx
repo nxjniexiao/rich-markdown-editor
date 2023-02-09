@@ -125,6 +125,9 @@ export default function Example(props) {
             setTimeout(() => resolve(URL.createObjectURL(file)), 1500);
           });
         }}
+        onChange={(getValue, getJson) => {
+          console.log("on change: ", "\n", getValue(), "\n", getJson());
+        }}
         embeds={embeds}
         {...props}
       />

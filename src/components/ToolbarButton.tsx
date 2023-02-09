@@ -38,6 +38,7 @@ export default styled.button<Props>`
     right: -4px;
     left: -4px;
     bottom: -4px;
+    z-index: -1; // fix: toolbar title does not shown when hovered
   }
 
   ${props => props.active && "opacity: 1;"};

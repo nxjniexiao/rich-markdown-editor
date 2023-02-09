@@ -29,9 +29,6 @@ const Template: Story<Props> = args => <Editor {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  onChange: (getValue, getJson) => {
-    console.log("on change: ", "\n", getValue(), "\n", getJson());
-  },
   defaultValue: `# Welcome
 
 Just an easy to use **Markdown** editor with \`slash commands\``,
@@ -39,9 +36,6 @@ Just an easy to use **Markdown** editor with \`slash commands\``,
 
 export const Color = Template.bind({});
 Color.args = {
-  onChange: (getValue, getJson) => {
-    console.log("on change: ", "\n", getValue(), "\n", getJson());
-  },
   defaultValue: `
 # Color
 
@@ -51,9 +45,6 @@ Color.args = {
 
 export const Math = Template.bind({});
 Math.args = {
-  onChange: (getValue, getJson) => {
-    console.log("on change: ", "\n", getValue(), "\n", getJson());
-  },
   defaultValue: `
 # 公式
 
