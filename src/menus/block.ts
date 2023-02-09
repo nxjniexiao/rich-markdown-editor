@@ -97,7 +97,7 @@ export default function blockMenuItems(
       keywords: "script",
     },
     {
-      name: "math",
+      name: "math_block",
       title: "公式",
       icon: MathIcon,
       keywords: "math",

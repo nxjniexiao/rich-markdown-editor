@@ -48,7 +48,9 @@ export default class InlineMath extends Node {
   // 序列化为 markdown 时使用
   toMarkdown(state, node) {
     state.write("$$");
+    state.ensureNewLine();
     state.renderContent(node);
+    state.ensureNewLine();
     state.write("$$\n\n");
   }
 

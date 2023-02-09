@@ -165,7 +165,7 @@ test("renders math inline", () => {
   expect(renderToHtml("$a^2+b^2=c^2$")).toMatchSnapshot();
 });
 
-test("renders math", () => {
+test("renders math block", () => {
   expect(
     renderToHtml("$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$")
   ).toMatchSnapshot();

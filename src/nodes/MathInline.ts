@@ -22,23 +22,18 @@ export default class InlineMath extends Node {
   commands({ type, schema }) {
     return attrs => (
       state: EditorState,
-      dispatch: (tr: Transaction) => void
+      dispatch?: (tr: Transaction) => void
     ) => {
       const selectionContent = state.selection.content().content;
-      let text = "";
-      // 拼接 paragraph 的 text content
-      selectionContent.forEach(node => {
-        node.content.forEach(_node => {
-          if (_node.type === schema.nodes.text) {
-            text += _node.text;
-          }
-        });
-      });
-      dispatch(
-        state.tr
-          .replaceSelectionWith(type.create(attrs, schema.text(text)))
-          .scrollIntoView()
-      );
+      const text = selectionContent.textBetween(0, selectionContent.size);
+      if (!text) return false;
+      if (dispatch) {
+        dispatch(
+          state.tr
+            .replaceSelectionWith(type.create(attrs, schema.text(text)))
+            .scrollIntoView()
+        );
+      }
       return true;
     };
   }

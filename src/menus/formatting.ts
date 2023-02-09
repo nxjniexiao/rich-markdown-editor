@@ -76,7 +76,7 @@ export default function formattingMenuItems(
       active: isMarkActive(schema.marks.code_inline),
     },
     {
-      name: "inline_math",
+      name: "math_inline",
       tooltip: "行内公式",
       icon: MathIcon,
       active: isNodeActive(schema.nodes.inline_math),

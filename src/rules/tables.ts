@@ -25,7 +25,8 @@ export default function markdownTables(md: MarkdownIt): void {
           // Exclude the token that is text content of math
           const siblingType = existing[idx + 1]?.type;
           const isMathText =
-            siblingType === "inline_math_close" || siblingType === "math_close";
+            siblingType === "math_inline_close" ||
+            siblingType === "math_block_close";
           // a schema agnostic way to know if a node is inline code would be
           // great, for now we are stuck checking the node type.
           if (
