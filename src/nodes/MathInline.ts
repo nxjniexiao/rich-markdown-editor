@@ -24,8 +24,8 @@ export default class InlineMath extends Node {
       state: EditorState,
       dispatch?: (tr: Transaction) => void
     ) => {
-      const selectionContent = state.selection.content().content;
-      const text = selectionContent.textBetween(0, selectionContent.size);
+      const node = state.doc.cut(state.selection.from, state.selection.to);
+      const text = node.textContent;
       if (!text) return false;
       if (dispatch) {
         dispatch(
