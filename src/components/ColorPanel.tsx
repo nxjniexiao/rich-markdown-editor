@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { EditorView } from "prosemirror-view";
 import { MenuItem } from "../types";
 import theme from "../styles/theme";
+import useComponentSize from "../hooks/useComponentSize";
+import useViewportHeight from "../hooks/useViewportHeight";
 
 type Props = {
   active: boolean;
@@ -11,11 +13,23 @@ type Props = {
   view: EditorView;
   theme: typeof theme;
   item: MenuItem;
-  forwardedRef?: React.RefObject<HTMLDivElement>;
+  anchorRef: React.RefObject<HTMLElement>;
 };
 
 function ColorPanel(props: Props) {
-  const { active, commands, forwardedRef } = props;
+  const { active, commands, anchorRef } = props;
+
+  const colorPanelRef = React.useRef<HTMLDivElement>(null);
+  const { width: panelWidth, height: panelHeight } = useComponentSize(
+    colorPanelRef
+  );
+  const viewportHeight = useViewportHeight();
+  const position = calcPosition(
+    anchorRef,
+    panelWidth,
+    panelHeight,
+    viewportHeight
+  );
 
   const colors = [
     "rgb(33, 37, 41)",
@@ -50,7 +64,7 @@ function ColorPanel(props: Props) {
   if (!active) return null;
 
   return (
-    <ColorPanelDiv ref={forwardedRef}>
+    <ColorPanelDiv ref={colorPanelRef} position={position}>
       <div className="title">文字颜色</div>
       <div className="color-container">
         {colors.map(color => (
@@ -93,10 +107,17 @@ function ColorPanel(props: Props) {
   );
 }
 
-const ColorPanelDiv = styled.div`
+const ColorPanelDiv = styled.div<{
+  position: Position;
+}>`
   position: absolute;
-  left: 0;
-  top: calc(100% + 20px);
+  ${({ position }) => {
+    let str = "";
+    ["left", "right", "top", "bottom"].forEach(pos => {
+      if (position[pos] !== undefined) str += `${pos}: ${position[pos]};`;
+    });
+    return str;
+  }}
   width: 200px;
   padding: 10px;
   line-height: 1.4;
@@ -129,9 +150,37 @@ const ColorPanelDiv = styled.div`
   }
 `;
 
-export default React.forwardRef(function ColorPanelWithForwardedRef(
-  props: Props,
-  ref: React.RefObject<HTMLDivElement>
-) {
-  return <ColorPanel {...props} forwardedRef={ref} />;
-});
+export default ColorPanel;
+
+type Position = {
+  left?: string;
+  bottom?: string;
+  right?: string;
+  top?: string;
+};
+
+function calcPosition(
+  ref: React.RefObject<HTMLElement>,
+  width: number,
+  height: number,
+  viewPortHeight: number | void
+): Position {
+  if (width === 0 || height === 0 || !viewPortHeight) {
+    return {
+      left: "-1000px",
+      top: "0",
+    };
+  }
+  const rect = ref.current?.getBoundingClientRect();
+  if (rect && rect.bottom + height + 20 > viewPortHeight) {
+    return {
+      left: "0",
+      bottom: "40px",
+    };
+  } else {
+    return {
+      left: "0",
+      top: "calc(100% + 20px)",
+    };
+  }
+}

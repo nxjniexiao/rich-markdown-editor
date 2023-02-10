@@ -18,7 +18,7 @@ type Props = {
 function ColorButton(props: Props) {
   const { item, theme, tooltip: Tooltip } = props;
 
-  const colorPanelRef = React.useRef<HTMLDivElement>(null);
+  const toolbarButtonRef = React.useRef<HTMLButtonElement>(null);
   const [active, setActive] = React.useState(false);
   const isActive = false;
 
@@ -27,12 +27,15 @@ function ColorButton(props: Props) {
       <ToolbarButton
         active={isActive}
         onClick={() => setActive(active => !active)}
+        ref={toolbarButtonRef}
       >
         <Tooltip tooltip={item.tooltip} placement="top">
           <PaletteIcon color={theme.toolbarItem} />
         </Tooltip>
       </ToolbarButton>
-      <ColorPanel ref={colorPanelRef} active={active} {...props} />
+      {active && (
+        <ColorPanel anchorRef={toolbarButtonRef} active={active} {...props} />
+      )}
     </ColorButtonDiv>
   );
 }
