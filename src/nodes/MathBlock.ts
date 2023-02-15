@@ -19,8 +19,8 @@ export default class InlineMath extends Node {
       inline: false,
       atom: true,
       code: true,
-      parseDom: [{ tag: "math" }],
-      toDom: () => ["math", {}, 0],
+      parseDOM: [{ tag: "math:not([inline])" }],
+      toDOM: () => ["math", {}, 0],
     };
   }
 
