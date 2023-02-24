@@ -46,6 +46,9 @@ export default class BlockMenuTrigger extends Extension {
     const button = document.createElement("button");
     button.className = "block-menu-trigger";
     button.type = "button";
+    button.addEventListener("click", () => {
+      this.options.onOpen("");
+    });
     ReactDOM.render(<PlusIcon color="currentColor" />, button);
 
     return [
@@ -111,9 +114,6 @@ export default class BlockMenuTrigger extends Extension {
               if (isEmpty) {
                 decorations.push(
                   Decoration.widget(parent.pos, () => {
-                    button.addEventListener("click", () => {
-                      this.options.onOpen("");
-                    });
                     return button;
                   })
                 );
