@@ -69,6 +69,7 @@ import Underline from "./marks/Underline";
 
 // plugins
 import BlockMenuTrigger from "./plugins/BlockMenuTrigger";
+import SideMenuTrigger from "./plugins/SideMenuTrigger";
 import EmojiTrigger from "./plugins/EmojiTrigger";
 import Folding from "./plugins/Folding";
 import History from "./plugins/History";
@@ -396,6 +397,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
             onOpen: this.handleOpenBlockMenu,
             onClose: this.handleCloseBlockMenu,
           }),
+          new SideMenuTrigger(),
           new EmojiTrigger({
             onOpen: (search: string) => {
               this.setState({ emojiMenuOpen: true, blockMenuSearch: search });

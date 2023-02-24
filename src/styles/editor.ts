@@ -361,7 +361,7 @@ export const StyledEditor = styled("div")<{
     margin: 0;
     padding-left: 1.5em;
     font-style: italic;
-    overflow: hidden;
+    /* overflow: hidden; */
     position: relative;
 
     &:before {
@@ -953,6 +953,12 @@ export const StyledEditor = styled("div")<{
       transform: scale(1.2);
       color: ${props => props.theme.text};
     }
+  }
+
+  .block-menu-trigger.side-menu-trigger {
+    opacity: 1;
+    margin-${props => (props.rtl ? "right" : "left")}: -48px;
+    pointer-events: initial;
   }
 
   .ProseMirror-focused .block-menu-trigger,
