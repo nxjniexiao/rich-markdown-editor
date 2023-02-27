@@ -361,7 +361,7 @@ export const StyledEditor = styled("div")<{
     margin: 0;
     padding-left: 1.5em;
     font-style: italic;
-    /* overflow: hidden; */
+    overflow: hidden;
     position: relative;
 
     &:before {
