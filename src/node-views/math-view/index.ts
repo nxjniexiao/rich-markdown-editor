@@ -4,7 +4,11 @@ import { StepMap } from "prosemirror-transform";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { keymap } from "prosemirror-keymap";
 import { undo, redo } from "prosemirror-history";
-import { chainCommands, deleteSelection, newlineInCode } from "prosemirror-commands";
+import {
+  chainCommands,
+  deleteSelection,
+  newlineInCode,
+} from "prosemirror-commands";
 import { GetPos, isMacOS } from "./types";
 
 import "katex/dist/katex.css";
@@ -59,12 +63,13 @@ export class MathView implements NodeView {
     this.getPos = getPos;
     this.dom = document.createElement(inline ? "span" : "div");
     this.dom.classList.add("math");
+    this.handleDocumentClick = this.handleDocumentClick.bind(this);
 
     this.mathEditor = document.createElement(inline ? "span" : "div");
     this.mathEditor.classList.add("math-editor");
     this.mathContent = document.createElement(inline ? "span" : "div");
     this.mathContent.classList.add("math-content");
-    this.mathContent.addEventListener("click", () => this.selectNode());
+    this.mathContent.addEventListener("click", () => this.select());
     this.dom.appendChild(this.mathEditor);
     this.dom.appendChild(this.mathContent);
     this.inline = inline;
@@ -223,15 +228,24 @@ export class MathView implements NodeView {
     this.mathEditor.classList[hasContent ? "remove" : "add"]("empty");
   }
 
-  selectNode() {
+  select() {
     this.dom.classList.add("ProseMirror-selectedNode");
     this.dom.classList.add("editing");
     // This is necessary on first insert.
     setTimeout(() => this.innerView.focus(), 1);
+    document.addEventListener("click", this.handleDocumentClick);
   }
 
-  deselectNode() {
+  deselect() {
     this.dom.classList.remove("ProseMirror-selectedNode");
     this.dom.classList.remove("editing");
+    document.removeEventListener("click", this.handleDocumentClick);
+  }
+
+  handleDocumentClick(event) {
+    const target = event.target;
+    const mathDom = target?.closest(".math");
+    if (mathDom === this.dom) return;
+    this.deselect();
   }
 }
