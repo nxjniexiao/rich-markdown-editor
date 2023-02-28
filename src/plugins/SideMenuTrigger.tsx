@@ -29,11 +29,19 @@ export default class SideMenuTrigger extends Extension {
 
       this.dragging = true;
 
+      const handleDragStart = event => {
+        if (event.target && event.dataTransfer) {
+          const dom = event.target.nextSibling;
+          event.dataTransfer.setDragImage(dom, 0, 0);
+        }
+      };
       const resetDragging = () => {
         this.dragging = false;
+        document.removeEventListener("dragstart", handleDragStart);
         document.removeEventListener("drop", resetDragging);
         document.removeEventListener("mouseup", resetDragging);
       };
+      document.addEventListener("dragstart", handleDragStart);
       document.addEventListener("drop", resetDragging);
       document.addEventListener("mouseup", resetDragging);
     });
