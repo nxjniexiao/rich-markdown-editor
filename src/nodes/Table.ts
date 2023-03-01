@@ -126,7 +126,7 @@ export default class Table extends Node {
 
   get plugins() {
     return [
-      tableEditing(),
+      tableEditing({ allowTableNodeSelection: true }),
       new Plugin({
         props: {
           decorations: state => {
