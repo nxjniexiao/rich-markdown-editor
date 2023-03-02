@@ -1,27 +1,19 @@
 import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token";
 
+const COLOR_REGEX_START = /^(<<<?)(#(?:[0-9a-f]{3}){1,2}|rgba?\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})(?:,\s*(\d+(?:\.\d+)?))?\))\s/i;
+const COLOR_REGEX_END = /^>{2,5}/;
+
 export default function markdownItBackgroundColor(md: MarkdownIt): void {
   function renderColor(tokens, idx) {
     const token = tokens[idx];
-    const color = token.attrGet("color");
+    const type = token.meta?.type;
+    const styleName = type === "color" ? "color" : "background-color";
+    const color = token.attrGet(type);
 
     if (token.nesting === 1) {
       // opening tag
-      return `<span style="color: ${color}">`;
-    } else {
-      // closing tag
-      return "</span>";
-    }
-  }
-
-  function renderBackgroundColor(tokens, idx) {
-    const token = tokens[idx];
-    const backgroundColor = token.attrGet("backgroundColor");
-
-    if (token.nesting === 1) {
-      // opening tag
-      return `<span style="background-color: ${backgroundColor}">`;
+      return `<span style="${styleName}: ${color}">`;
     } else {
       // closing tag
       return "</span>";
@@ -30,163 +22,131 @@ export default function markdownItBackgroundColor(md: MarkdownIt): void {
 
   md.renderer.rules.color_open = renderColor;
   md.renderer.rules.color_close = renderColor;
-  md.renderer.rules.backgroundColor_open = renderBackgroundColor;
-  md.renderer.rules.backgroundColor_close = renderBackgroundColor;
+  md.renderer.rules.backgroundColor_open = renderColor;
+  md.renderer.rules.backgroundColor_close = renderColor;
 
-  // insert a new rule after the "inline" rules are parsed
-  md.core.ruler.after("inline", "backgroundColor", state => {
-    const tokens = state.tokens;
-    let i = tokens.length;
-    while (i--) {
-      const token = tokens[i];
-      if (token.type === "inline") {
-        const tokenChildren = token.children;
-        if (tokenChildren) {
-          let j = tokenChildren.length;
-          while (j--) {
-            const current = tokenChildren[j];
-            if (current.type === "text") {
-              const text = current.content;
-              colorTokensManager.find(text);
-              const newTokens = colorTokensManager.tokens();
-              if (newTokens.length > 0) {
-                tokenChildren.splice(j, 1, ...newTokens);
-              }
+  // insert a new rule after the "escape" rules are parsed
+  md.inline.ruler.after("escape", "backgroundColor", state => {
+    const start = state.pos;
+    const marker = state.src.charCodeAt(start);
+
+    if (marker !== 0x3c /* < */ && marker !== 0x3e /* > */) {
+      return false;
+    }
+
+    const str = state.src.slice(start);
+
+    if (marker === 0x3c /* < */) {
+      const startMatch = COLOR_REGEX_START.exec(str);
+      if (startMatch) {
+        const type = startMatch[1].length === 3 ? "backgroundColor" : "color";
+        const token = state.push("text", "", 0);
+        token.content = startMatch[0];
+        token.meta = { type };
+        token.attrPush([type, startMatch[2]]);
+
+        // @ts-ignore
+        state.delimiters.push({
+          marker: -1,
+          length: 0,
+          token: state.tokens.length - 1,
+          end: -1,
+          open: true,
+          close: false,
+        });
+
+        state.pos += startMatch[0].length;
+        return true;
+      }
+      return false;
+    }
+
+    if (marker === 0x3e /* > */) {
+      const endMatch = COLOR_REGEX_END.exec(str);
+      if (endMatch) {
+        const contentArr: string[] = [];
+        if (endMatch[0].length === 5) {
+          // 颜色和背景色两个结束标签相邻（需要根据前一个开始标签判断前后关系）
+          let lastOpenToken: Token | undefined;
+          let i = state.delimiters.length;
+          while (i--) {
+            const delimiter = state.delimiters[i];
+            if (delimiter.marker === -1 && delimiter.open) {
+              lastOpenToken = state.tokens[delimiter.token];
+              break;
             }
           }
+          const lastOpenType = lastOpenToken?.meta?.type;
+          if (lastOpenType === "color") {
+            contentArr.push(">>", ">>>");
+          } else {
+            contentArr.push(">>>", ">>");
+          }
+        } else if (endMatch[0].length === 2) {
+          // 颜色结束标签
+          contentArr.push(">>");
+        } else {
+          // 背景色结束标签
+          contentArr.push(">>>");
         }
+
+        contentArr.forEach(text => {
+          const type = text.length === 3 ? "backgroundColor" : "color";
+          const token = state.push("text", "", 0);
+          token.content = text;
+          token.meta = { type };
+
+          // @ts-ignore
+          state.delimiters.push({
+            marker: -1,
+            length: 0,
+            token: state.tokens.length - 1,
+            end: -1,
+            open: false,
+            close: true,
+          });
+
+          state.pos += text.length;
+        });
+
+        return true;
       }
+
+      return false;
     }
+
     return false;
   });
+
+  // 后处理：根据 delimiters 把对应的文字 token 改为颜色 token
+  md.inline.ruler2.after("emphasis", "backgroundColor", state => {
+    const delimiters = state.delimiters;
+    const max = delimiters.length;
+    let i = 0;
+    for (; i < max; i++) {
+      const startDelim = delimiters[i];
+
+      // 只处理颜色标记
+      if (startDelim.marker !== -1) {
+        continue;
+      }
+
+      // 只处理开始标记
+      if (startDelim.end === -1) {
+        continue;
+      }
+
+      const endDelim = delimiters[startDelim.end];
+
+      let token = state.tokens[startDelim.token];
+      token.type = `${token.meta.type}_open`;
+      token.nesting = 1;
+      token.content = "";
+
+      token = state.tokens[endDelim.token];
+      token.type = `${token.meta.type}_close`;
+      token.nesting = -1;
+      token.content = "";
+    }
+  });
 }
-
-type Separation = {
-  type: "color" | "backgroundColor";
-  nesting: 1 | -1;
-  index: number;
-  fixIndexAfter: number;
-  color?: string;
-  pair: Separation;
-};
-
-class ColorTokensManager {
-  static BG_COLOR_REGEX = /<<<(#(?:[0-9a-f]{3}){1,2}|rgba?\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})(?:,\s*(\d+(?:\.\d+)?))?\))\s(.*?)>>>/i;
-  static COLOR_REGEX = /<<(#(?:[0-9a-f]{3}){1,2}|rgba?\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})(?:,\s*(\d+(?:\.\d+)?))?\))\s(.*?)>>/i;
-
-  separations: Separation[] = [];
-  originalText: string;
-  text: string;
-
-  insert(separation: Separation, i: number) {
-    const index = separation.index;
-    let sameIndexSeparation: Separation | undefined;
-    for (; i < this.separations.length; i++) {
-      const current = this.separations[i];
-      if (current?.index > index) break;
-      // index 相同时，找到 nesting 相同的分割点
-      if (current?.index === index && current.nesting === separation.nesting) {
-        sameIndexSeparation = current;
-        break;
-      }
-    }
-    if (sameIndexSeparation) {
-      let targetPairIndex = sameIndexSeparation.pair.index;
-      let separationPairIndex = separation.pair.index;
-      if (
-        separation.nesting === -1 &&
-        targetPairIndex === separationPairIndex
-      ) {
-        targetPairIndex = this.separations.findIndex(
-          item => item === (sameIndexSeparation as Separation).pair
-        );
-        separationPairIndex = this.separations.findIndex(
-          item => item === separation.pair
-        );
-      }
-      i = targetPairIndex < separationPairIndex ? i : i + 1;
-    }
-    this.separations.splice(i, 0, separation);
-    return i;
-  }
-
-  add(separations: [Separation, Separation]) {
-    let start = 0;
-    separations.forEach(separation => {
-      start = this.insert(separation, start) + 1;
-      // 修正插入位置后面的index
-      for (let i = start; i < this.separations.length; i++) {
-        this.separations[i].index += separation.fixIndexAfter;
-      }
-    });
-  }
-
-  find(text) {
-    this.originalText = this.text = text;
-    this.separations = [];
-    const arr: [RegExp, Separation["type"]][] = [
-      [ColorTokensManager.BG_COLOR_REGEX, "backgroundColor"],
-      [ColorTokensManager.COLOR_REGEX, "color"],
-    ];
-    arr.forEach(([reg, type]) => {
-      let match: RegExpExecArray | null;
-      while ((match = reg.exec(this.text))) {
-        const index = match.index;
-        const color = match[1];
-        const coloredText = match[6];
-        const openSeparation = {
-          type,
-          nesting: 1,
-          index,
-          fixIndexAfter: -(color.length + (type === "color" ? 3 : 4)), // color: 2, i.e. "<<" and a space after color
-          color,
-        } as Separation;
-        const closeSeparation = {
-          type,
-          nesting: -1,
-          index: index + coloredText.length,
-          fixIndexAfter: -(type === "color" ? 2 : 3), // color: ">>", backgroundColor: ">>>"
-        } as Separation;
-        openSeparation.pair = closeSeparation;
-        closeSeparation.pair = openSeparation;
-        this.add([openSeparation, closeSeparation]);
-        this.text = this.text.replace(reg, "$6");
-      }
-    });
-  }
-
-  tokens() {
-    const tokens: Token[] = [];
-    if (this.separations.length > 0) {
-      let start = 0;
-      this.separations.forEach(({ index, type, color, nesting }, i) => {
-        const str = this.text.slice(start, index);
-        if (str) {
-          const textToken = new Token("text", "", 0);
-          textToken.content = str;
-          tokens.push(textToken);
-        }
-        const colorToken = new Token(
-          `${type}${nesting === 1 ? "_open" : "_close"}`,
-          "",
-          nesting
-        );
-        if (nesting === 1) colorToken.attrs = [[type, color || ""]];
-        tokens.push(colorToken);
-        // 处理最后一段文字
-        const lastIndex = this.separations.length - 1;
-        const last = this.separations[lastIndex];
-        if (i === lastIndex && last.index < this.text.length) {
-          const str = this.text.slice(last.index);
-          const textToken = new Token("text", "", 0);
-          textToken.content = str;
-          tokens.push(textToken);
-        }
-        start = index;
-      });
-    }
-    return tokens;
-  }
-}
-
-const colorTokensManager = new ColorTokensManager();
