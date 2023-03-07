@@ -1,6 +1,7 @@
 /* global window File Promise */
 import * as React from "react";
 import memoize from "lodash/memoize";
+import OrderedMap from "orderedmap";
 import { EditorState, Selection, Plugin } from "prosemirror-state";
 import { dropCursor } from "prosemirror-dropcursor";
 import { gapCursor } from "prosemirror-gapcursor";
@@ -218,7 +219,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     [name: string]: (node, view, getPos, decorations) => ComponentView;
   };
   nodes: { [name: string]: NodeSpec };
-  marks: { [name: string]: MarkSpec };
+  marks: OrderedMap<MarkSpec>;
   commands: Record<string, any>;
   rulePlugins: PluginSimple[];
 

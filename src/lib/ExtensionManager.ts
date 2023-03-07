@@ -1,4 +1,4 @@
-import { Schema } from "prosemirror-model";
+import { MarkSpec, Schema } from "prosemirror-model";
 import { keymap } from "prosemirror-keymap";
 import { MarkdownParser } from "prosemirror-markdown";
 import OrderedMap from "orderedmap";
@@ -90,7 +90,7 @@ export default class ExtensionManager {
       .filter(extension => extension.type === "mark")
       .reduce((marks, { name, schema }: Mark) => {
         return marks.addToEnd(name, schema);
-      }, OrderedMap.from({}));
+      }, OrderedMap.from<MarkSpec>({}));
   }
 
   get plugins() {
