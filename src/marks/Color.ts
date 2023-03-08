@@ -1,6 +1,7 @@
 import { setMark } from "../commands/setMark";
+import { unsetMark } from "../commands/unsetMark";
 import Mark from "./Mark";
-import colorRule from "../rules/color";
+// import colorRule from "../rules/color";
 
 export default class Color extends Mark {
   get name() {
@@ -55,8 +56,8 @@ export default class Color extends Mark {
   }
 
   commands({ type }) {
-    return ({ color } = { color: "currentColor" }) => {
-      return setMark(type, { color });
+    return ({ color }: { color: string }) => {
+      return color ? setMark(type, { color }) : unsetMark(type);
     };
   }
 }

@@ -21,6 +21,6 @@ export default abstract class Mark extends Extension {
   }
 
   commands({ type }) {
-    return () => toggleMark(type);
+    return (...args: any[]) => toggleMark(type);
   }
 }

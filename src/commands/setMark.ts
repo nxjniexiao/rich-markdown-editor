@@ -1,5 +1,6 @@
-import { Mark, MarkType, ResolvedPos, Schema } from "prosemirror-model";
+import { MarkType, ResolvedPos } from "prosemirror-model";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
+import { getMarkAttributes, markApplies } from "../helpers";
 
 // setMark from tiptap
 export function setMark(markType: MarkType, attrs: { [key: string]: unknown }) {
@@ -61,63 +62,4 @@ export function setMark(markType: MarkType, attrs: { [key: string]: unknown }) {
     }
     return true;
   };
-}
-
-export function getMarkAttributes(
-  state: EditorState,
-  typeOrName: string | MarkType
-): Record<string, any> {
-  const type = getMarkType(typeOrName, state.schema);
-  const { from, to, empty } = state.selection;
-  const marks: Mark[] = [];
-
-  if (empty) {
-    if (state.storedMarks) {
-      marks.push(...state.storedMarks);
-    }
-
-    marks.push(...state.selection.$head.marks());
-  } else {
-    state.doc.nodesBetween(from, to, node => {
-      marks.push(...node.marks);
-    });
-  }
-
-  const mark = marks.find(markItem => markItem.type.name === type.name);
-
-  if (!mark) {
-    return {};
-  }
-
-  return { ...mark.attrs };
-}
-
-export function getMarkType(
-  nameOrType: string | MarkType,
-  schema: Schema
-): MarkType {
-  if (typeof nameOrType === "string") {
-    if (!schema.marks[nameOrType]) {
-      throw Error(
-        `There is no mark type named '${nameOrType}'. Maybe you forgot to add the extension?`
-      );
-    }
-
-    return schema.marks[nameOrType];
-  }
-
-  return nameOrType;
-}
-
-function markApplies(doc, ranges, type) {
-  for (let i = 0; i < ranges.length; i++) {
-    const { $from, $to } = ranges[i];
-    let can = $from.depth === 0 ? doc.type.allowsMarkType(type) : false;
-    doc.nodesBetween($from.pos, $to.pos, node => {
-      if (can) return false;
-      can = node.inlineContent && node.type.allowsMarkType(type);
-    });
-    if (can) return true;
-  }
-  return false;
 }

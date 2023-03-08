@@ -1,4 +1,5 @@
 import { setMark } from "../commands/setMark";
+import { unsetMark } from "../commands/unsetMark";
 import markdownItBackgroundColor from "../rules/backgroundColor";
 import Mark from "./Mark";
 
@@ -58,8 +59,10 @@ export default class BackgroundColor extends Mark {
   }
 
   commands({ type }) {
-    return ({ backgroundColor } = { backgroundColor: "" }) => {
-      return setMark(type, { backgroundColor });
+    return ({ backgroundColor }: { backgroundColor: string }) => {
+      return backgroundColor
+        ? setMark(type, { backgroundColor })
+        : unsetMark(type);
     };
   }
 }

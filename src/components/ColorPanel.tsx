@@ -32,7 +32,7 @@ function ColorPanel(props: Props) {
   );
 
   const colors = [
-    "rgb(33, 37, 41)",
+    "", // "rgb(33, 37, 41)"
     "rgb(140, 140, 140)",
     "rgb(92, 92, 92)",
     "rgb(163, 67, 31)",
@@ -47,7 +47,7 @@ function ColorPanel(props: Props) {
   ];
 
   const backgroundColors = [
-    "transparent",
+    "", // "transparent"
     "rgba(140, 140, 140, 0.12)",
     "rgba(92, 92, 92, 0.2)",
     "rgba(163, 67, 31, 0.2)",
@@ -84,7 +84,7 @@ function ColorPanel(props: Props) {
           let style: React.CSSProperties = {
             backgroundColor,
           };
-          if (backgroundColor === "transparent") {
+          if (backgroundColor === "") {
             style = {
               backgroundColor: "transparent",
               backgroundImage: `linear-gradient(45deg, rgba(0, 0, 0, .25) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, .25) 0), linear-gradient(45deg, rgba(0, 0, 0, .25) 25%, transparent 0, transparent 75%, rgba(0, 0, 0, .25) 0)`,
