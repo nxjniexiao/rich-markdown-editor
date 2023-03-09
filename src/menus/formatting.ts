@@ -13,6 +13,7 @@ import {
   InputIcon,
   HighlightIcon,
   MathIcon,
+  ItalicIcon,
 } from "outline-icons";
 import { isInTable } from "prosemirror-tables";
 import { EditorState } from "prosemirror-state";
@@ -50,6 +51,12 @@ export default function formattingMenuItems(
       tooltip: dictionary.strong,
       icon: BoldIcon,
       active: isMarkActive(schema.marks.strong),
+    },
+    {
+      name: "em",
+      tooltip: dictionary.em,
+      icon: ItalicIcon,
+      active: isMarkActive(schema.marks.em),
     },
     {
       name: "strikethrough",
