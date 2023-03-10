@@ -55,6 +55,8 @@ import Table from "./nodes/Table";
 import TableCell from "./nodes/TableCell";
 import TableHeadCell from "./nodes/TableHeadCell";
 import TableRow from "./nodes/TableRow";
+import MathInline from "./nodes/MathInline";
+import MathBlock from "./nodes/MathBlock";
 
 // marks
 import Bold from "./marks/Bold";
@@ -81,8 +83,7 @@ import SmartText from "./plugins/SmartText";
 import TrailingNode from "./plugins/TrailingNode";
 import PasteHandler from "./plugins/PasteHandler";
 import { PluginSimple } from "markdown-it";
-import MathInline from "./nodes/MathInline";
-import MathBlock from "./nodes/MathBlock";
+import NestedEmphasis from "./plugins/NestedEmphasis";
 
 export { schema, parser, serializer, renderToHtml } from "./server";
 
@@ -413,6 +414,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           new MaxLength({
             maxLength: this.props.maxLength,
           }),
+          new NestedEmphasis(),
         ].filter(extension => {
           // Optionaly disable extensions
           if (this.props.disableExtensions) {
