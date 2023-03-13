@@ -12,6 +12,8 @@ export default class SideMenuTrigger extends Extension {
 
   sideMenuPos: number;
 
+  nodeType: string; // 拖拽按钮右侧的节点类型
+
   get plugins() {
     const button = document.createElement("button");
     button.className = "block-menu-trigger side-menu-trigger";
@@ -30,7 +32,8 @@ export default class SideMenuTrigger extends Extension {
       this.dragging = true;
 
       const handleDragStart = event => {
-        if (event.target && event.dataTransfer) {
+        // 拖拽按钮渲染在 heading 节点内部，不需要手动设置 drag image
+        if (event.target && event.dataTransfer && this.nodeType !== "heading") {
           const dom = event.target.nextSibling;
           event.dataTransfer.setDragImage(dom, 0, 0);
         }
@@ -53,10 +56,15 @@ export default class SideMenuTrigger extends Extension {
             return DecorationSet.empty;
           },
           apply(tr, value, oldState, newState) {
-            const sideMenuPos = tr.getMeta("sideMenuPos");
-            if (sideMenuPos !== undefined) {
+            const sideMenu = tr.getMeta("sideMenu");
+            if (sideMenu !== undefined) {
+              // 拖拽按钮渲染在 heading 节点内部
+              const pos =
+                sideMenu.nodeType === "heading"
+                  ? sideMenu.pos + 1
+                  : sideMenu.pos;
               return DecorationSet.create(newState.doc, [
-                Decoration.widget(sideMenuPos, () => {
+                Decoration.widget(pos, () => {
                   return button;
                 }),
               ]);
@@ -84,8 +92,15 @@ export default class SideMenuTrigger extends Extension {
               }
 
               if (index !== this.sideMenuPos) {
+                const resolved = view.state.doc.resolve(index);
+                this.nodeType = resolved.nodeAfter?.type.name || "";
                 this.sideMenuPos = index;
-                view.dispatch(view.state.tr.setMeta("sideMenuPos", index));
+                view.dispatch(
+                  view.state.tr.setMeta("sideMenu", {
+                    pos: this.sideMenuPos,
+                    nodeType: this.nodeType,
+                  })
+                );
               }
               return false;
             }, 50),
