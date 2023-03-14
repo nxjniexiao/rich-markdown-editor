@@ -73,7 +73,7 @@ export default function formattingMenuItems(
     },
     {
       name: "custom",
-      tooltip: "文字颜色",
+      tooltip: dictionary.textColor,
       icon: ColorButton,
       visible: !isTemplate,
     },
@@ -85,7 +85,7 @@ export default function formattingMenuItems(
     },
     {
       name: "math_inline",
-      tooltip: "行内公式",
+      tooltip: dictionary.equation,
       icon: MathIcon,
       active: isNodeActive(schema.nodes.inline_math),
     },

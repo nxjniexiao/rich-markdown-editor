@@ -98,7 +98,7 @@ export default function blockMenuItems(
     },
     {
       name: "math_block",
-      title: "公式",
+      title: dictionary.blockEquation,
       icon: MathIcon,
       keywords: "math",
     },
