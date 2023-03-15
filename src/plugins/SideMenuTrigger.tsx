@@ -74,6 +74,11 @@ export default class SideMenuTrigger extends Extension {
           },
         },
         props: {
+          handleClick: (view, pos, e) => {
+            const target = e.target as Element;
+            if (target?.closest(".side-menu-trigger")) return true;
+            return false;
+          },
           handleDOMEvents: {
             mouseover: debounce((view: EditorView, event) => {
               if (this.dragging) return;
