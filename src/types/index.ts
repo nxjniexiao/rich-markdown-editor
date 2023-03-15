@@ -1,5 +1,6 @@
 import * as React from "react";
 import { EditorState } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
 
 export enum ToastType {
   Error = "error",
@@ -17,6 +18,7 @@ export type MenuItem = {
   attrs?: Record<string, any>;
   visible?: boolean;
   active?: (state: EditorState) => boolean;
+  onClick?: (view: EditorView, onClose: () => void) => void; // support custom onClick
 };
 
 export type EmbedDescriptor = MenuItem & {

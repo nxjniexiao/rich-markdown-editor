@@ -20,6 +20,7 @@ import { SearchResult } from "./components/LinkEditor";
 import { EmbedDescriptor, ToastType } from "./types";
 import SelectionToolbar from "./components/SelectionToolbar";
 import BlockMenu from "./components/BlockMenu";
+import SideMenu from "./components/SideMenu";
 import EmojiMenu from "./components/EmojiMenu";
 import LinkToolbar from "./components/LinkToolbar";
 import Tooltip from "./components/Tooltip";
@@ -167,6 +168,7 @@ type State = {
   isEditorFocused: boolean;
   selectionMenuOpen: boolean;
   blockMenuOpen: boolean;
+  sideMenuOpen: boolean; // block menu on left side
   linkMenuOpen: boolean;
   blockMenuSearch: string;
   emojiMenuOpen: boolean;
@@ -200,6 +202,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     isEditorFocused: false,
     selectionMenuOpen: false,
     blockMenuOpen: false,
+    sideMenuOpen: false,
     linkMenuOpen: false,
     blockMenuSearch: "",
     emojiMenuOpen: false,
@@ -399,7 +402,10 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
             onOpen: this.handleOpenBlockMenu,
             onClose: this.handleCloseBlockMenu,
           }),
-          new SideMenuTrigger(),
+          new SideMenuTrigger({
+            onOpen: this.handleOpenSideMenu,
+            onClose: this.handleCloseSideMenu,
+          }),
           new EmojiTrigger({
             onOpen: (search: string) => {
               this.setState({ emojiMenuOpen: true, blockMenuSearch: search });
@@ -681,6 +687,15 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     this.setState({ blockMenuOpen: false });
   };
 
+  handleOpenSideMenu = () => {
+    this.setState({ sideMenuOpen: true });
+  };
+
+  handleCloseSideMenu = () => {
+    if (!this.state.sideMenuOpen) return;
+    this.setState({ sideMenuOpen: false });
+  };
+
   handleSelectRow = (index: number, state: EditorState) => {
     this.view.dispatch(selectRow(index)(state.tr));
   };
@@ -824,6 +839,21 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
                   isActive={this.state.blockMenuOpen}
                   search={this.state.blockMenuSearch}
                   onClose={this.handleCloseBlockMenu}
+                  uploadImage={this.props.uploadImage}
+                  onLinkToolbarOpen={this.handleOpenLinkMenu}
+                  onImageUploadStart={this.props.onImageUploadStart}
+                  onImageUploadStop={this.props.onImageUploadStop}
+                  onShowToast={this.props.onShowToast}
+                  embeds={this.props.embeds}
+                />
+                <SideMenu
+                  view={this.view}
+                  commands={this.commands}
+                  dictionary={dictionary}
+                  rtl={isRTL}
+                  isActive={this.state.sideMenuOpen}
+                  search={this.state.blockMenuSearch}
+                  onClose={this.handleCloseSideMenu}
                   uploadImage={this.props.uploadImage}
                   onLinkToolbarOpen={this.handleOpenLinkMenu}
                   onImageUploadStart={this.props.onImageUploadStart}

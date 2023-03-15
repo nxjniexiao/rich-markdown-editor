@@ -49,6 +49,10 @@ export default class SideMenuTrigger extends Extension {
       document.addEventListener("mouseup", resetDragging);
     });
 
+    button.addEventListener("click", () => {
+      this.options.onOpen();
+    });
+
     return [
       new Plugin({
         state: {
@@ -77,6 +81,7 @@ export default class SideMenuTrigger extends Extension {
           handleClick: (view, pos, e) => {
             const target = e.target as Element;
             if (target?.closest(".side-menu-trigger")) return true;
+            this.options.onClose();
             return false;
           },
           handleDOMEvents: {

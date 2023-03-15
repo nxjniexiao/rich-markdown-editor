@@ -58,7 +58,10 @@ type State = {
   selectedIndex: number;
 };
 
-class CommandMenu<T = MenuItem> extends React.Component<Props<T>, State> {
+class CommandMenu<T extends MenuItem = MenuItem> extends React.Component<
+  Props<T>,
+  State
+> {
   menuRef = React.createRef<HTMLDivElement>();
   inputRef = React.createRef<HTMLInputElement>();
 
@@ -426,6 +429,8 @@ class CommandMenu<T = MenuItem> extends React.Component<Props<T>, State> {
     const filtered = items.filter(item => {
       if (item.name === "separator") return true;
 
+      if (item.onClick) return true;
+
       // Some extensions may be disabled, remove corresponding menu items
       if (
         item.name &&
@@ -501,7 +506,10 @@ class CommandMenu<T = MenuItem> extends React.Component<Props<T>, State> {
                   <ListItem key={index}>
                     {this.props.renderMenuItem(item as any, index, {
                       selected,
-                      onClick: () => this.insertItem(item),
+                      onClick: () =>
+                        item.onClick
+                          ? item.onClick(this.props.view, this.props.onClose)
+                          : this.insertItem(item),
                     })}
                   </ListItem>
                 );
