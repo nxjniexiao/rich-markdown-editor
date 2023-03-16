@@ -3,6 +3,7 @@ import { Props } from "..";
 import React from "react";
 import { Story, Meta } from "@storybook/react/types-6-0";
 import * as stories from "./index.stories";
+import "./style.css";
 
 export default {
   title: "Editor",

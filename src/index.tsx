@@ -169,6 +169,7 @@ type State = {
   selectionMenuOpen: boolean;
   blockMenuOpen: boolean;
   sideMenuOpen: boolean; // block menu on left side
+  sideMenuAnchor: Element | null; // anchor element of side menu
   linkMenuOpen: boolean;
   blockMenuSearch: string;
   emojiMenuOpen: boolean;
@@ -203,6 +204,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     selectionMenuOpen: false,
     blockMenuOpen: false,
     sideMenuOpen: false,
+    sideMenuAnchor: null,
     linkMenuOpen: false,
     blockMenuSearch: "",
     emojiMenuOpen: false,
@@ -687,8 +689,8 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     this.setState({ blockMenuOpen: false });
   };
 
-  handleOpenSideMenu = () => {
-    this.setState({ sideMenuOpen: true });
+  handleOpenSideMenu = (button: Element) => {
+    this.setState({ sideMenuOpen: true, sideMenuAnchor: button });
   };
 
   handleCloseSideMenu = () => {
@@ -851,15 +853,9 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
                   commands={this.commands}
                   dictionary={dictionary}
                   rtl={isRTL}
+                  anchor={this.state.sideMenuAnchor}
                   isActive={this.state.sideMenuOpen}
-                  search={this.state.blockMenuSearch}
                   onClose={this.handleCloseSideMenu}
-                  uploadImage={this.props.uploadImage}
-                  onLinkToolbarOpen={this.handleOpenLinkMenu}
-                  onImageUploadStart={this.props.onImageUploadStart}
-                  onImageUploadStop={this.props.onImageUploadStop}
-                  onShowToast={this.props.onShowToast}
-                  embeds={this.props.embeds}
                 />
               </React.Fragment>
             )}

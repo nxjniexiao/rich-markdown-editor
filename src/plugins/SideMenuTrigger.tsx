@@ -50,7 +50,7 @@ export default class SideMenuTrigger extends Extension {
     });
 
     button.addEventListener("click", () => {
-      this.options.onOpen();
+      this.options.onOpen(button);
     });
 
     return [
