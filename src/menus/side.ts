@@ -21,10 +21,12 @@ import {
   DuplicateIcon,
   InsertAboveIcon,
   InsertBelowIcon,
+  ReplaceIcon,
 } from "outline-icons";
 import { EditorView } from "prosemirror-view";
 import { Slice } from "prosemirror-model";
-import { TextSelection } from "prosemirror-state";
+import { NodeSelection, TextSelection } from "prosemirror-state";
+import { setBlockType } from "prosemirror-commands";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
 
@@ -68,11 +70,43 @@ export default function sideMenuItems(
       name: "separator",
     },
     {
-      name: "paragraph",
-      title: dictionary.text,
-      keywords: "text",
-      icon: MenuIcon,
-      shortcut: "^ ⇧ 0",
+      name: "turn_into",
+      title: dictionary.turnInto,
+      keywords: "turn into",
+      icon: ReplaceIcon,
+      subMenus: [
+        {
+          name: "paragraph",
+          title: dictionary.text,
+          keywords: "text",
+          icon: MenuIcon,
+          onClick: handleSetBlockType,
+        },
+        {
+          name: "heading",
+          title: dictionary.h1,
+          keywords: "h1 heading1 title",
+          icon: Heading1Icon,
+          attrs: { level: 1 },
+          onClick: handleSetBlockType,
+        },
+        {
+          name: "heading",
+          title: dictionary.h2,
+          keywords: "h2 heading2",
+          icon: Heading2Icon,
+          attrs: { level: 2 },
+          onClick: handleSetBlockType,
+        },
+        {
+          name: "heading",
+          title: dictionary.h3,
+          keywords: "h3 heading3",
+          icon: Heading3Icon,
+          attrs: { level: 3 },
+          onClick: handleSetBlockType,
+        },
+      ],
     },
   ];
 }
@@ -104,4 +138,14 @@ function handleAddBlock(above: boolean) {
     view.focus();
     onClose();
   };
+}
+
+function handleSetBlockType(view: EditorView, onClose: () => void) {
+  const { selection, schema } = view.state;
+  const type = schema.nodes[this.name];
+  if (!type) return;
+  if (selection instanceof NodeSelection) {
+    setBlockType(type, this.attrs)(view.state, view.dispatch);
+  }
+  onClose();
 }

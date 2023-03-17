@@ -19,6 +19,7 @@ export type MenuItem = {
   visible?: boolean;
   active?: (state: EditorState) => boolean;
   onClick?: (view: EditorView, onClose: () => void) => void; // support custom onClick
+  subMenus?: MenuItem[];
 };
 
 export type EmbedDescriptor = MenuItem & {

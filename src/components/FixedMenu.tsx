@@ -1,8 +1,9 @@
+import { NextIcon } from "outline-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { Portal } from "react-portal";
 import styled from "styled-components";
 import { Props, Wrapper } from "./CommandMenu";
-import BlockMenuItem from "./BlockMenuItem";
+import FixedMenuSub from "./FixedMenuSub";
 import getSideMenuItems from "../menus/side";
 
 type FixedMenuProps = Omit<
@@ -36,27 +37,21 @@ const defaultPosition: Position = {
 };
 
 function FixedMenu(props: FixedMenuProps) {
-  const { id, isActive, view, onClose } = props;
+  const {
+    id = "side-menu-container",
+    isActive,
+    view,
+    onClose,
+    renderMenuItem,
+  } = props;
+
   const items = getSideMenuItems(props.dictionary);
-
   const [position, setPosition] = useState<Position>({ ...defaultPosition });
-
   const menuRef = useRef<HTMLElement>();
 
-  const handleModalClicked = () => {
-    onClose();
-  };
-
-  const renderMenuItem = (item, _index, options) => {
-    return (
-      <BlockMenuItem
-        onClick={options.onClick}
-        selected={options.selected}
-        icon={item.icon}
-        title={item.title}
-        shortcut={item.shortcut}
-      />
-    );
+  const handleModalClicked = e => {
+    const container = e.target?.closest(`#${id}`);
+    if (!container) onClose();
   };
 
   useEffect(() => {
@@ -73,12 +68,7 @@ function FixedMenu(props: FixedMenuProps) {
   return (
     <Portal>
       <Modal active={isActive} onClick={handleModalClicked}>
-        <Container
-          id={id || "side-menu-container"}
-          active={isActive}
-          ref={menuRef}
-          {...position}
-        >
+        <Container id={id} active={isActive} ref={menuRef} {...position}>
           <List>
             {items.map((item, index) => {
               if (item.name === "separator") {
@@ -100,6 +90,18 @@ function FixedMenu(props: FixedMenuProps) {
                     selected,
                     onClick: () => item.onClick?.(view, onClose),
                   })}
+                  {item.subMenus && (
+                    <>
+                      <NextIcon className="next" />
+                      <FixedMenuSub
+                        className="submenu-wrapper"
+                        subMenus={item.subMenus}
+                        renderMenuItem={renderMenuItem}
+                        view={view}
+                        onClose={onClose}
+                      />
+                    </>
+                  )}
                 </ListItem>
               );
             })}
@@ -115,7 +117,7 @@ function FixedMenu(props: FixedMenuProps) {
   );
 }
 
-const List = styled.ol`
+export const List = styled.ol`
   list-style: none;
   text-align: left;
   height: 100%;
@@ -123,9 +125,23 @@ const List = styled.ol`
   margin: 0;
 `;
 
-const ListItem = styled.li`
+export const ListItem = styled.li`
   padding: 0;
   margin: 0;
+  position: relative;
+  .next {
+    position: absolute;
+    right: 0;
+    top: 6px;
+  }
+  .submenu-wrapper {
+    display: none;
+  }
+  &:hover {
+    .submenu-wrapper {
+      display: block;
+    }
+  }
 `;
 
 const Empty = styled.div`
@@ -150,6 +166,8 @@ const Modal = styled.div`
 
 const Container = styled(Wrapper)`
   width: 220px;
+  max-height: initial;
+  overflow: visible;
 `;
 
 function calculatePosition(

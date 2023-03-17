@@ -65,6 +65,7 @@ export const base = {
   textColor: "Text color",
   tip: "Tip",
   tipNotice: "Tip notice",
+  turnInto: "Turn into",
   warning: "Warning",
   warningNotice: "Warning notice",
 };
