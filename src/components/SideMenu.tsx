@@ -21,13 +21,17 @@ type SideMenuProps = Omit<
 };
 
 function SideMenu(props: SideMenuProps) {
-  const items = getSideMenuItems(props.dictionary);
+  const items = getSideMenuItems({
+    dictionary: props.dictionary,
+    state: props.view.state,
+  });
 
   const renderMenuItem = (item, _index, options) => {
     return (
       <BlockMenuItem
         onClick={options.onClick}
         selected={options.selected}
+        active={item.active?.(props.view.state)}
         icon={item.icon}
         title={item.title}
         shortcut={item.shortcut}

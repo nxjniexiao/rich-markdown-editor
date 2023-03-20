@@ -1,3 +1,4 @@
+import { CheckmarkIcon } from "outline-icons";
 import * as React from "react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import styled, { withTheme } from "styled-components";
@@ -5,6 +6,7 @@ import theme from "../styles/theme";
 
 export type Props = {
   selected: boolean;
+  active?: boolean;
   disabled?: boolean;
   onClick: () => void;
   theme: typeof theme;
@@ -16,6 +18,7 @@ export type Props = {
 
 function BlockMenuItem({
   selected,
+  active,
   disabled,
   onClick,
   title,
@@ -61,6 +64,7 @@ function BlockMenuItem({
       )}
       {title}
       {shortcut && <Shortcut>{shortcut}</Shortcut>}
+      {active && <CheckmarkIcon />}
     </MenuItem>
   );
 }

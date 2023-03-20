@@ -25,18 +25,22 @@ import {
 } from "outline-icons";
 import { EditorView } from "prosemirror-view";
 import { Slice } from "prosemirror-model";
-import { NodeSelection, TextSelection } from "prosemirror-state";
+import { EditorState, NodeSelection, TextSelection } from "prosemirror-state";
 import { setBlockType } from "prosemirror-commands";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
+import isNodeActive from "../queries/isNodeActive";
 
 const SSR = typeof window === "undefined";
 const isMac = !SSR && window.navigator.platform === "MacIntel";
 const mod = isMac ? "⌘" : "ctrl";
 
-export default function sideMenuItems(
-  dictionary: typeof baseDictionary
-): MenuItem[] {
+export default function sideMenuItems(arg: {
+  dictionary: typeof baseDictionary;
+  state: EditorState;
+}): MenuItem[] {
+  const { dictionary, state } = arg;
+  const { schema } = state;
   return [
     {
       name: "delete",
@@ -67,9 +71,6 @@ export default function sideMenuItems(
       onClick: handleAddBlock(false),
     },
     {
-      name: "separator",
-    },
-    {
       name: "turn_into",
       title: dictionary.turnInto,
       keywords: "turn into",
@@ -80,6 +81,8 @@ export default function sideMenuItems(
           title: dictionary.text,
           keywords: "text",
           icon: MenuIcon,
+          active: isNodeActive(schema.nodes.paragraph),
+          visible: setBlockType(schema.nodes.paragraph)(state),
           onClick: handleSetBlockType,
         },
         {
@@ -87,6 +90,8 @@ export default function sideMenuItems(
           title: dictionary.h1,
           keywords: "h1 heading1 title",
           icon: Heading1Icon,
+          active: isNodeActive(schema.nodes.heading, { level: 1 }),
+          visible: setBlockType(schema.nodes.heading, { level: 1 })(state),
           attrs: { level: 1 },
           onClick: handleSetBlockType,
         },
@@ -95,6 +100,8 @@ export default function sideMenuItems(
           title: dictionary.h2,
           keywords: "h2 heading2",
           icon: Heading2Icon,
+          active: isNodeActive(schema.nodes.heading, { level: 2 }),
+          visible: setBlockType(schema.nodes.heading, { level: 2 })(state),
           attrs: { level: 2 },
           onClick: handleSetBlockType,
         },
@@ -103,6 +110,8 @@ export default function sideMenuItems(
           title: dictionary.h3,
           keywords: "h3 heading3",
           icon: Heading3Icon,
+          active: isNodeActive(schema.nodes.heading, { level: 3 }),
+          visible: setBlockType(schema.nodes.heading, { level: 3 })(state),
           attrs: { level: 3 },
           onClick: handleSetBlockType,
         },

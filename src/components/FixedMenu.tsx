@@ -4,7 +4,6 @@ import { Portal } from "react-portal";
 import styled from "styled-components";
 import { Props, Wrapper } from "./CommandMenu";
 import FixedMenuSub from "./FixedMenuSub";
-import getSideMenuItems from "../menus/side";
 
 type FixedMenuProps = Omit<
   Props,
@@ -41,13 +40,21 @@ function FixedMenu(props: FixedMenuProps) {
     id = "side-menu-container",
     isActive,
     view,
+    items,
     onClose,
     renderMenuItem,
   } = props;
-
-  const items = getSideMenuItems(props.dictionary);
   const [position, setPosition] = useState<Position>({ ...defaultPosition });
   const menuRef = useRef<HTMLElement>();
+
+  const filteredItems = items.filter(item => {
+    if (item.visible === false) return false;
+    if (item.subMenus) {
+      item.subMenus = item.subMenus.filter(item => item.visible !== false);
+    }
+    if (item.subMenus?.length === 0) return false;
+    return true;
+  });
 
   const handleModalClicked = e => {
     const container = e.target?.closest(`#${id}`);
@@ -70,7 +77,7 @@ function FixedMenu(props: FixedMenuProps) {
       <Modal active={isActive} onClick={handleModalClicked}>
         <Container id={id} active={isActive} ref={menuRef} {...position}>
           <List>
-            {items.map((item, index) => {
+            {filteredItems.map((item, index) => {
               if (item.name === "separator") {
                 return (
                   <ListItem key={index}>
@@ -90,7 +97,7 @@ function FixedMenu(props: FixedMenuProps) {
                     selected,
                     onClick: () => item.onClick?.(view, onClose),
                   })}
-                  {item.subMenus && (
+                  {item.subMenus && item.subMenus.length > 0 && (
                     <>
                       <NextIcon className="next" />
                       <FixedMenuSub
