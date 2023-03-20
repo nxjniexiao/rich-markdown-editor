@@ -92,14 +92,8 @@ export default class SideMenuTrigger extends Extension {
                 top: event.clientY,
               });
               if (!pos) return;
-              let index: number;
-              if (pos.inside === -1) {
-                // 鼠标落在了顶级节点，不在任何节点之内
-                index = pos.pos;
-              } else {
-                const resolvedPos = view.state.doc.resolve(pos.pos);
-                index = resolvedPos.start(1) - 1;
-              }
+              const resolvedPos = view.state.doc.resolve(pos.pos);
+              const index = resolvedPos.start(1) - 1;
 
               if (index !== this.sideMenuPos) {
                 const resolved = view.state.doc.resolve(index);
