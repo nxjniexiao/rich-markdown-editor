@@ -5,16 +5,8 @@ import {
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
-  HorizontalRuleIcon,
   OrderedListIcon,
-  PageBreakIcon,
-  TableIcon,
   TodoListIcon,
-  ImageIcon,
-  StarredIcon,
-  WarningIcon,
-  InfoIcon,
-  LinkIcon,
   MathIcon,
   MenuIcon,
   TrashIcon,
@@ -24,16 +16,15 @@ import {
   ReplaceIcon,
 } from "outline-icons";
 import { EditorView } from "prosemirror-view";
-import { Slice } from "prosemirror-model";
+import { NodeType, Slice } from "prosemirror-model";
 import { EditorState, NodeSelection, TextSelection } from "prosemirror-state";
 import { setBlockType } from "prosemirror-commands";
+import { isInTable } from "prosemirror-tables";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
 import isNodeActive from "../queries/isNodeActive";
-
-const SSR = typeof window === "undefined";
-const isMac = !SSR && window.navigator.platform === "MacIntel";
-const mod = isMac ? "⌘" : "ctrl";
+import isInList from "../queries/isInList";
+import toggleList from "../commands/toggleList";
 
 export default function sideMenuItems(arg: {
   dictionary: typeof baseDictionary;
@@ -41,6 +32,10 @@ export default function sideMenuItems(arg: {
 }): MenuItem[] {
   const { dictionary, state } = arg;
   const { schema } = state;
+  const isTable = isInTable(state);
+  const isList = isInList(state);
+  const allowBlocks = !isTable && !isList;
+
   return [
     {
       name: "delete",
@@ -76,6 +71,7 @@ export default function sideMenuItems(arg: {
       keywords: "turn into",
       icon: ReplaceIcon,
       subMenus: [
+        // PARAGRAPH
         {
           name: "paragraph",
           title: dictionary.text,
@@ -85,6 +81,7 @@ export default function sideMenuItems(arg: {
           visible: setBlockType(schema.nodes.paragraph)(state),
           onClick: handleSetBlockType,
         },
+        // HEADING
         {
           name: "heading",
           title: dictionary.h1,
@@ -113,6 +110,64 @@ export default function sideMenuItems(arg: {
           active: isNodeActive(schema.nodes.heading, { level: 3 }),
           visible: setBlockType(schema.nodes.heading, { level: 3 })(state),
           attrs: { level: 3 },
+          onClick: handleSetBlockType,
+        },
+        // LIST
+        {
+          name: "checkbox_list",
+          title: dictionary.checkboxList,
+          keywords: "checklist checkbox task",
+          icon: TodoListIcon,
+          active: isNodeActive(schema.nodes.checkbox_list),
+          visible: allowBlocks || isList,
+          onClick: handleSetBlockListType,
+        },
+        {
+          name: "bullet_list",
+          title: dictionary.bulletList,
+          keywords: "bullet list",
+          icon: BulletedListIcon,
+          active: isNodeActive(schema.nodes.bullet_list),
+          visible: allowBlocks || isList,
+          onClick: handleSetBlockListType,
+        },
+        {
+          name: "ordered_list",
+          title: dictionary.orderedList,
+          keywords: "ordered list",
+          icon: OrderedListIcon,
+          active: isNodeActive(schema.nodes.ordered_list),
+          visible: allowBlocks || isList,
+          onClick: handleSetBlockListType,
+        },
+        // CODE BLOCK
+        {
+          name: "code_block",
+          title: dictionary.codeBlock,
+          keywords: "code block",
+          icon: CodeIcon,
+          active: isNodeActive(schema.nodes.code_block),
+          visible: setBlockType(schema.nodes.code_block)(state),
+          onClick: handleSetBlockType,
+        },
+        // QUOTE
+        {
+          name: "blockquote",
+          title: dictionary.quote,
+          keywords: "block quote",
+          icon: BlockQuoteIcon,
+          active: isNodeActive(schema.nodes.blockquote),
+          visible: setBlockType(schema.nodes.blockquote)(state),
+          onClick: handleSetBlockType,
+        },
+        // BLOCK EQUATION
+        {
+          name: "math_block",
+          title: dictionary.blockEquation,
+          keywords: "Block equation",
+          icon: MathIcon,
+          active: isNodeActive(schema.nodes.math_block),
+          visible: setBlockType(schema.nodes.math_block)(state),
           onClick: handleSetBlockType,
         },
       ],
@@ -155,6 +210,23 @@ function handleSetBlockType(view: EditorView, onClose: () => void) {
   if (!type) return;
   if (selection instanceof NodeSelection) {
     setBlockType(type, this.attrs)(view.state, view.dispatch);
+  }
+  onClose();
+}
+
+function handleSetBlockListType(view: EditorView, onClose: () => void) {
+  const { selection, schema } = view.state;
+  const type = schema.nodes[this.name];
+  if (selection instanceof NodeSelection) {
+    let itemType: NodeType | undefined;
+    switch (this.name) {
+      case "checkbox_list":
+        itemType = schema.nodes.checkbox_item;
+      case "bullet_list":
+      case "ordered_list":
+        itemType = schema.nodes.list_item;
+    }
+    itemType && toggleList(type, itemType)(view.state, view.dispatch);
   }
   onClose();
 }
