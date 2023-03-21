@@ -72,6 +72,8 @@ function FixedMenu(props: FixedMenuProps) {
     }
   }, [isActive]);
 
+  if (!isActive) return null;
+
   return (
     <Portal>
       <Modal active={isActive} onClick={handleModalClicked}>
@@ -142,11 +144,11 @@ export const ListItem = styled.li`
     top: 6px;
   }
   .submenu-wrapper {
-    display: none;
+    opacity: 0;
   }
   &:hover {
     .submenu-wrapper {
-      display: block;
+      opacity: 1;
     }
   }
 `;

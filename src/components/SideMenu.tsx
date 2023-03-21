@@ -30,7 +30,6 @@ function SideMenu(props: SideMenuProps) {
     return (
       <BlockMenuItem
         onClick={options.onClick}
-        selected={options.selected}
         active={item.active?.(props.view.state)}
         icon={item.icon}
         title={item.title}

@@ -15,8 +15,25 @@ type FixedMenuSubProps = {
 function FixedMenuSub(props: FixedMenuSubProps) {
   const { className, subMenus = [], renderMenuItem, view, onClose } = props;
 
+  const wrapperRef = React.useRef<HTMLElement>();
+
+  React.useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    setTimeout(() => {
+      const rect = wrapper.getBoundingClientRect();
+      let top = 0;
+      if (rect.top < 0) {
+        top = -rect.top;
+      } else if (rect.bottom > window.innerHeight) {
+        top = window.innerHeight - rect.bottom;
+      }
+      wrapper.setAttribute("style", `top: ${top}px;`);
+    });
+  }, []);
+
   return (
-    <SubMenusWrapper className={className}>
+    <SubMenusWrapper className={className} ref={wrapperRef}>
       <List>
         {subMenus.map((item, index) => {
           if (item.name === "separator") {
@@ -44,6 +61,7 @@ const SubMenusWrapper = styled.div`
   position: absolute;
   left: 100%;
   top: 0;
+  transform: translate(0, -50%);
   background-color: #fff;
   border-radius: 4px;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,
