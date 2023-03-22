@@ -25,6 +25,7 @@ import baseDictionary from "../dictionary";
 import isNodeActive from "../queries/isNodeActive";
 import isInList from "../queries/isInList";
 import toggleList from "../commands/toggleList";
+import clearNodes from "../commands/clearNodes";
 
 export default function sideMenuItems(arg: {
   dictionary: typeof baseDictionary;
@@ -78,7 +79,7 @@ export default function sideMenuItems(arg: {
           keywords: "text",
           icon: MenuIcon,
           active: isNodeActive(schema.nodes.paragraph),
-          visible: setBlockType(schema.nodes.paragraph)(state),
+          visible: true,
           onClick: handleSetBlockType,
         },
         // HEADING
@@ -208,6 +209,11 @@ function handleSetBlockType(view: EditorView, onClose: () => void) {
   const { selection, schema } = view.state;
   const type = schema.nodes[this.name];
   if (!type) return;
+  if (this.name === "paragraph") {
+    clearNodes(view.state, view.dispatch);
+    onClose();
+    return;
+  }
   if (selection instanceof NodeSelection) {
     setBlockType(type, this.attrs)(view.state, view.dispatch);
   }
