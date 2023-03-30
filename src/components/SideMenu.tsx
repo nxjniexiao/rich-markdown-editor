@@ -21,10 +21,12 @@ type SideMenuProps = Omit<
 };
 
 function SideMenu(props: SideMenuProps) {
-  const items = getSideMenuItems({
-    dictionary: props.dictionary,
-    state: props.view.state,
-  });
+  const items = props.isActive
+    ? getSideMenuItems({
+        dictionary: props.dictionary,
+        state: props.view.state,
+      })
+    : [];
 
   const renderMenuItem = (item, _index, options) => {
     return (

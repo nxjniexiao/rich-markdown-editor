@@ -19,11 +19,9 @@ import { EditorView } from "prosemirror-view";
 import { NodeType, Slice } from "prosemirror-model";
 import { EditorState, NodeSelection, TextSelection } from "prosemirror-state";
 import { setBlockType } from "prosemirror-commands";
-import { isInTable } from "prosemirror-tables";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
 import isNodeActive from "../queries/isNodeActive";
-import isInList from "../queries/isInList";
 import toggleList from "../commands/toggleList";
 import clearNodes from "../commands/clearNodes";
 
@@ -33,11 +31,15 @@ export default function sideMenuItems(arg: {
 }): MenuItem[] {
   const { dictionary, state } = arg;
   const { schema } = state;
-  const isTable = isInTable(state);
-  const isList = isInList(state);
-  const allowBlocks = !isTable && !isList;
+  let isTable = false;
+  let isParagraph = false;
+  if (state.selection instanceof NodeSelection) {
+    const name = state.selection.node.type.name;
+    isTable = name === "table";
+    isParagraph = name === "paragraph";
+  }
 
-  return [
+  const items = [
     {
       name: "delete",
       title: dictionary.delete,
@@ -120,7 +122,7 @@ export default function sideMenuItems(arg: {
           keywords: "checklist checkbox task",
           icon: TodoListIcon,
           active: isNodeActive(schema.nodes.checkbox_list),
-          visible: allowBlocks || isList,
+          visible: isParagraph,
           onClick: handleSetBlockListType,
         },
         {
@@ -129,7 +131,7 @@ export default function sideMenuItems(arg: {
           keywords: "bullet list",
           icon: BulletedListIcon,
           active: isNodeActive(schema.nodes.bullet_list),
-          visible: allowBlocks || isList,
+          visible: isParagraph,
           onClick: handleSetBlockListType,
         },
         {
@@ -138,7 +140,7 @@ export default function sideMenuItems(arg: {
           keywords: "ordered list",
           icon: OrderedListIcon,
           active: isNodeActive(schema.nodes.ordered_list),
-          visible: allowBlocks || isList,
+          visible: isParagraph,
           onClick: handleSetBlockListType,
         },
         // CODE BLOCK
@@ -174,12 +176,20 @@ export default function sideMenuItems(arg: {
       ],
     },
   ];
+
+  if (isTable) {
+    const item = items.find(item => item.name === "turn_into");
+    if (item) item.subMenus = [];
+  }
+
+  return items;
 }
 
 function handleDeleteBlock(view: EditorView, onClose: () => void) {
   let tr = view.state.tr;
   tr = tr.replaceSelection(Slice.empty);
   view.dispatch(tr);
+  view.focus();
   onClose();
 }
 
@@ -188,6 +198,7 @@ function handleDuplicateBlock(view: EditorView, onClose: () => void) {
   const selection = view.state.selection;
   tr = tr.replace(selection.from, selection.from, selection.content());
   view.dispatch(tr);
+  view.focus();
   onClose();
 }
 
@@ -211,11 +222,13 @@ function handleSetBlockType(view: EditorView, onClose: () => void) {
   if (!type) return;
   if (this.name === "paragraph") {
     clearNodes(view.state, view.dispatch);
+    view.focus();
     onClose();
     return;
   }
   if (selection instanceof NodeSelection) {
     setBlockType(type, this.attrs)(view.state, view.dispatch);
+    view.focus();
   }
   onClose();
 }
@@ -234,5 +247,6 @@ function handleSetBlockListType(view: EditorView, onClose: () => void) {
     }
     itemType && toggleList(type, itemType)(view.state, view.dispatch);
   }
+  view.focus();
   onClose();
 }
