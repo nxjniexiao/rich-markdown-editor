@@ -580,6 +580,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
             (self.props.readOnlyWriteCheckboxes &&
               transactions.some(isEditingCheckbox)))
         ) {
+          if (!self.view) self.view = this; // fix: throw err when init a doc with folded content, as this.view is undefined.
           self.handleChange();
         }
 
