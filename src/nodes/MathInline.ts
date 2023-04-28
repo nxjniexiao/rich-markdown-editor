@@ -75,7 +75,7 @@ export default class InlineMath extends Node {
   // 序列化为 markdown 时使用
   toMarkdown(state, node) {
     state.write("$");
-    state.renderContent(node);
+    state.text(node.textContent, false);
     state.write("$");
   }
 

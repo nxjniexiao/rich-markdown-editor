@@ -49,7 +49,7 @@ export default class InlineMath extends Node {
   toMarkdown(state, node) {
     state.write("$$");
     state.ensureNewLine();
-    state.renderContent(node);
+    state.text(node.textContent, false);
     state.ensureNewLine();
     state.write("$$\n\n");
   }
