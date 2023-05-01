@@ -69,7 +69,10 @@ export class MathView implements NodeView {
     this.mathEditor.classList.add("math-editor");
     this.mathContent = document.createElement(inline ? "span" : "div");
     this.mathContent.classList.add("math-content");
-    this.mathContent.addEventListener("click", () => this.select());
+    this.mathContent.addEventListener("click", () => {
+      if (!view.editable) return;
+      this.select();
+    });
     this.dom.appendChild(this.mathEditor);
     this.dom.appendChild(this.mathContent);
     this.inline = inline;
