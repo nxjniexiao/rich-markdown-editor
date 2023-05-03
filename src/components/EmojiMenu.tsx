@@ -3,6 +3,7 @@ import gemojies from "gemoji";
 import FuzzySearch from "fuzzy-search";
 import CommandMenu, { Props } from "./CommandMenu";
 import EmojiMenuItem from "./EmojiMenuItem";
+import memoize from "lodash/memoize";
 
 type Emoji = {
   name: string;
@@ -21,6 +22,22 @@ const searcher = new FuzzySearch<{
   sort: true,
 });
 
+const memoizedSearch = memoize(function(key: string) {
+  const result = searcher.search(key).map(item => {
+    const description = item.description;
+    const name = item.names[0];
+    return {
+      ...item,
+      name: "emoji",
+      title: name,
+      description,
+      attrs: { markup: name, "data-name": name },
+    };
+  });
+
+  return result.slice(0, 10);
+});
+
 class EmojiMenu extends React.Component<
   Omit<
     Props<Emoji>,
@@ -35,19 +52,8 @@ class EmojiMenu extends React.Component<
     const { search = "" } = this.props;
 
     const n = search.toLowerCase();
-    const result = searcher.search(n).map(item => {
-      const description = item.description;
-      const name = item.names[0];
-      return {
-        ...item,
-        name: "emoji",
-        title: name,
-        description,
-        attrs: { markup: name, "data-name": name },
-      };
-    });
 
-    return result.slice(0, 10);
+    return memoizedSearch(n);
   }
 
   clearSearch = () => {

@@ -681,6 +681,10 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     this.setState({ linkMenuOpen: false });
   };
 
+  handleCloseEmojiMenu = () => {
+    this.setState({ emojiMenuOpen: false });
+  };
+
   handleOpenBlockMenu = (search: string) => {
     this.setState({ blockMenuOpen: true, blockMenuSearch: search });
   };
@@ -832,7 +836,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
                   rtl={isRTL}
                   isActive={this.state.emojiMenuOpen}
                   search={this.state.blockMenuSearch}
-                  onClose={() => this.setState({ emojiMenuOpen: false })}
+                  onClose={this.handleCloseEmojiMenu}
                 />
                 <BlockMenu
                   view={this.view}
