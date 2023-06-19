@@ -3,6 +3,7 @@ import debounce from "lodash/debounce";
 import { Props } from "..";
 import React from "react";
 import { Story, Meta } from "@storybook/react/types-6-0";
+import Attach from "./external-extensions/attachment/attachment-node";
 
 export default {
   title: "Editor",
@@ -32,6 +33,24 @@ Default.args = {
   defaultValue: `# Welcome
 
 Just an easy to use **Markdown** editor with \`slash commands\``,
+};
+
+export const Attachment = Template.bind({});
+Attachment.args = {
+  extensions: [new Attach()],
+  defaultValue: `
+# 自定义附件
+
+测试对附件的支持[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]，对cmap的支持[[cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12]]，以及词条的支持[[word: b516f615-00ca-4e4d-b24d-1d44179d3167]]。新增加的解析规则不应影响链接[a link](http://www.getoutline.com)。
+
+不应该解析成功的案例测试:
+
+- 类型错误 [[test: 123-abc]]
+- 未关闭 [[attach: 123-abc
+- 多余空格 [[ attach: 123-abc]]
+- 多余空格 [[attach: 123-abc ]]
+- ID为中文 [[attach: 中文]]
+`,
 };
 
 export const Color = Template.bind({});
