@@ -18,7 +18,7 @@ import {
 import { EditorView } from "prosemirror-view";
 import { NodeType, Slice } from "prosemirror-model";
 import { EditorState, NodeSelection, TextSelection } from "prosemirror-state";
-import { setBlockType } from "prosemirror-commands";
+import { setBlockType, wrapIn } from "prosemirror-commands";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
 import isNodeActive from "../queries/isNodeActive";
@@ -227,7 +227,12 @@ function handleSetBlockType(view: EditorView, onClose: () => void) {
     return;
   }
   if (selection instanceof NodeSelection) {
-    setBlockType(type, this.attrs)(view.state, view.dispatch);
+    // fix: change type to blockquote failed
+    if (type === schema.nodes.blockquote) {
+      wrapIn(type, this.attrs)(view.state, view.dispatch);
+    } else {
+      setBlockType(type, this.attrs)(view.state, view.dispatch);
+    }
     view.focus();
   }
   onClose();
