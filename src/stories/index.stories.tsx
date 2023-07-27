@@ -4,6 +4,7 @@ import { Props } from "..";
 import React from "react";
 import { Story, Meta } from "@storybook/react/types-6-0";
 import Attach from "./external-extensions/attachment/attachment-node";
+import BlockAttach from "./external-extensions/block-attachment/block-attachment-node";
 
 export default {
   title: "Editor",
@@ -33,6 +34,21 @@ Default.args = {
   defaultValue: `# Welcome
 
 Just an easy to use **Markdown** editor with \`slash commands\``,
+};
+
+export const BlockAttachment = Template.bind({});
+BlockAttachment.args = {
+  extensions: [new BlockAttach()],
+  defaultValue: `
+# 自定义块级附件
+
+块级附件
+{{cmap: 123}}
+
+附件2
+
+{{cmap: 456}}
+`,
 };
 
 export const Attachment = Template.bind({});
