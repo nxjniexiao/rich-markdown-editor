@@ -74,6 +74,7 @@ export default class Attachment extends Node {
 }
 
 function BlockAttachmentComp(props) {
+  const { isSelected } = props;
   const { type, id } = props.node.attrs;
   const [attachmentData, setAttachmentData] = React.useState<any>({});
 
@@ -84,5 +85,9 @@ function BlockAttachmentComp(props) {
     });
   }, [type, id]);
 
-  return <div>{attachmentData.name}</div>;
+  return (
+    <div className={isSelected ? "ProseMirror-selectednode" : ""}>
+      {attachmentData.name}
+    </div>
+  );
 }
