@@ -35,7 +35,7 @@ export default class SideMenuTrigger extends Extension {
         // 拖拽按钮渲染在 heading 节点内部，不需要手动设置 drag image
         if (event.target && event.dataTransfer && this.nodeType !== "heading") {
           const dom = event.target.nextSibling;
-          event.dataTransfer.setDragImage(dom, 0, 0);
+          if (dom) event.dataTransfer.setDragImage(dom, 0, 0);
         }
       };
       const resetDragging = () => {
@@ -92,7 +92,9 @@ export default class SideMenuTrigger extends Extension {
                 top: event.clientY,
               });
               if (!pos) return;
-              const resolvedPos = view.state.doc.resolve(pos.pos);
+              const resolvedPos = view.state.doc.resolve(
+                pos.inside === -1 ? pos.pos : pos.inside // fix wrong pos when hover on block with custom node view
+              );
               const index = resolvedPos.start(1) - 1;
 
               if (index !== this.sideMenuPos) {
