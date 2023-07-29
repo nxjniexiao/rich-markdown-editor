@@ -42,6 +42,12 @@ export default class Attachment extends Node {
     };
   }
 
+  stopEvent(event) {
+    // Don't stop drop event
+    const isDropEvent = event.type === "drop";
+    return isDropEvent ? false : true;
+  }
+
   component = props => {
     return <BlockAttachmentComp {...props} />;
   };
@@ -78,6 +84,11 @@ function BlockAttachmentComp(props) {
   const { type, id } = props.node.attrs;
   const [attachmentData, setAttachmentData] = React.useState<any>({});
 
+  const allowDrag = e => {
+    // prevent default to allow drop
+    e.preventDefault();
+  };
+
   React.useEffect(() => {
     // api request
     setAttachmentData({
@@ -86,7 +97,12 @@ function BlockAttachmentComp(props) {
   }, [type, id]);
 
   return (
-    <div className={isSelected ? "ProseMirror-selectednode" : ""}>
+    <div
+      className={`block-attachment ${
+        isSelected ? " ProseMirror-selectednode" : ""
+      }`}
+      onDragOver={allowDrag}
+    >
       {attachmentData.name}
     </div>
   );

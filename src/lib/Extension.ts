@@ -49,6 +49,11 @@ export default class Extension {
     return attrs => () => false;
   }
 
+  // See https://prosemirror.net/docs/ref/#view.NodeView.stopEvent
+  stopEvent(e: Event): boolean {
+    return true;
+  }
+
   get defaultOptions() {
     return {};
   }
