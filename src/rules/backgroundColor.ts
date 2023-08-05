@@ -26,7 +26,7 @@ export default function markdownItBackgroundColor(md: MarkdownIt): void {
   md.renderer.rules.backgroundColor_close = renderColor;
 
   // insert a new rule after the "escape" rules are parsed
-  md.inline.ruler.after("escape", "backgroundColor", state => {
+  md.inline.ruler.after("escape", "backgroundColor", (state, silent) => {
     const start = state.pos;
     const marker = state.src.charCodeAt(start);
 
@@ -39,21 +39,23 @@ export default function markdownItBackgroundColor(md: MarkdownIt): void {
     if (marker === 0x3c /* < */) {
       const startMatch = COLOR_REGEX_START.exec(str);
       if (startMatch) {
-        const type = startMatch[1].length === 3 ? "backgroundColor" : "color";
-        const token = state.push("text", "", 0);
-        token.content = startMatch[0];
-        token.meta = { type };
-        token.attrPush([type, startMatch[2]]);
+        if (!silent) {
+          const type = startMatch[1].length === 3 ? "backgroundColor" : "color";
+          const token = state.push("text", "", 0);
+          token.content = startMatch[0];
+          token.meta = { type };
+          token.attrPush([type, startMatch[2]]);
 
-        // @ts-ignore
-        state.delimiters.push({
-          marker: -1,
-          length: 0,
-          token: state.tokens.length - 1,
-          end: -1,
-          open: true,
-          close: false,
-        });
+          // @ts-ignore
+          state.delimiters.push({
+            marker: -1,
+            length: 0,
+            token: state.tokens.length - 1,
+            end: -1,
+            open: true,
+            close: false,
+          });
+        }
 
         state.pos += startMatch[0].length;
         return true;
@@ -64,51 +66,52 @@ export default function markdownItBackgroundColor(md: MarkdownIt): void {
     if (marker === 0x3e /* > */) {
       const endMatch = COLOR_REGEX_END.exec(str);
       if (endMatch) {
-        const contentArr: string[] = [];
-        if (endMatch[0].length === 5) {
-          // 颜色和背景色两个结束标签相邻（需要根据前一个开始标签判断前后关系）
-          let lastOpenToken: Token | undefined;
-          let i = state.delimiters.length;
-          while (i--) {
-            const delimiter = state.delimiters[i];
-            if (delimiter.marker === -1 && delimiter.open) {
-              lastOpenToken = state.tokens[delimiter.token];
-              break;
+        if (!silent) {
+          const contentArr: string[] = [];
+          if (endMatch[0].length === 5) {
+            // 颜色和背景色两个结束标签相邻（需要根据前一个开始标签判断前后关系）
+            let lastOpenToken: Token | undefined;
+            let i = state.delimiters.length;
+            while (i--) {
+              const delimiter = state.delimiters[i];
+              if (delimiter.marker === -1 && delimiter.open) {
+                lastOpenToken = state.tokens[delimiter.token];
+                break;
+              }
             }
-          }
-          const lastOpenType = lastOpenToken?.meta?.type;
-          if (lastOpenType === "color") {
-            contentArr.push(">>", ">>>");
+            const lastOpenType = lastOpenToken?.meta?.type;
+            if (lastOpenType === "color") {
+              contentArr.push(">>", ">>>");
+            } else {
+              contentArr.push(">>>", ">>");
+            }
+          } else if (endMatch[0].length === 2) {
+            // 颜色结束标签
+            contentArr.push(">>");
           } else {
-            contentArr.push(">>>", ">>");
+            // 背景色结束标签
+            contentArr.push(">>>");
           }
-        } else if (endMatch[0].length === 2) {
-          // 颜色结束标签
-          contentArr.push(">>");
-        } else {
-          // 背景色结束标签
-          contentArr.push(">>>");
+
+          contentArr.forEach(text => {
+            const type = text.length === 3 ? "backgroundColor" : "color";
+            const token = state.push("text", "", 0);
+            token.content = text;
+            token.meta = { type };
+
+            // @ts-ignore
+            state.delimiters.push({
+              marker: -1,
+              length: 0,
+              token: state.tokens.length - 1,
+              end: -1,
+              open: false,
+              close: true,
+            });
+          });
         }
 
-        contentArr.forEach(text => {
-          const type = text.length === 3 ? "backgroundColor" : "color";
-          const token = state.push("text", "", 0);
-          token.content = text;
-          token.meta = { type };
-
-          // @ts-ignore
-          state.delimiters.push({
-            marker: -1,
-            length: 0,
-            token: state.tokens.length - 1,
-            end: -1,
-            open: false,
-            close: true,
-          });
-
-          state.pos += text.length;
-        });
-
+        state.pos += endMatch[0].length;
         return true;
       }
 
