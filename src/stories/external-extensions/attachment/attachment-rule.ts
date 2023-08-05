@@ -13,7 +13,7 @@ export default function markdownItAttachment(md: MarkdownIt): void {
 
   md.renderer.rules.attachment = renderAttachment;
 
-  md.inline.ruler.after("escape", "attachment", state => {
+  md.inline.ruler.after("escape", "attachment", (state, silent) => {
     const start = state.pos;
     const marker = state.src.charCodeAt(start);
     const markerAfter = state.src.charCodeAt(start + 1);
@@ -26,12 +26,14 @@ export default function markdownItAttachment(md: MarkdownIt): void {
     const str = state.src.slice(start);
     const match = ATTACHMENT_REGEX.exec(str);
     if (match) {
-      const type = match[1];
-      const id = match[2];
-      const token = state.push("attachment", "attachment", 0);
-      token.content = match[0];
-      token.attrPush(["type", type]);
-      token.attrPush(["id", id]);
+      if (!silent) {
+        const type = match[1];
+        const id = match[2];
+        const token = state.push("attachment", "attachment", 0);
+        token.content = match[0];
+        token.attrPush(["type", type]);
+        token.attrPush(["id", id]);
+      }
 
       state.pos += match[0].length;
       return true;

@@ -57,7 +57,7 @@ Attachment.args = {
   defaultValue: `
 # 自定义附件
 
-测试对附件的支持[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]，对cmap的支持[[cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12]]，以及词条的支持[[word: b516f615-00ca-4e4d-b24d-1d44179d3167]]。新增加的解析规则不应影响链接[a link](http://www.getoutline.com)。
+测试对附件的支持[[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]，对cmap的支持[[cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12]]，以及词条的支持[[[word: b516f615-00ca-4e4d-b24d-1d44179d3167]]。新增加的解析规则不应影响链接[a link](http://www.getoutline.com)。
 
 不应该解析成功的案例测试:
 
