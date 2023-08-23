@@ -24,7 +24,7 @@ export default class Attachment extends Node {
       },
       parseDOM: [
         {
-          tag: "attachment",
+          tag: `[class="${this.name}"`,
           getAttrs: (dom: HTMLIFrameElement) => {
             const type = dom.getAttribute("data-type") || "";
             const id = dom.getAttribute("data-id") || "";
@@ -33,8 +33,12 @@ export default class Attachment extends Node {
         },
       ],
       toDOM: node => [
-        "attachment",
-        { "data-type": node.attrs.type, "data-id": node.attrs.id },
+        "span",
+        {
+          class: this.name,
+          "data-type": node.attrs.type,
+          "data-id": node.attrs.id,
+        },
         0,
       ],
     };
