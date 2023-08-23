@@ -5,6 +5,8 @@ import React from "react";
 import { Story, Meta } from "@storybook/react/types-6-0";
 import Attach from "./external-extensions/attachment/attachment-node";
 import BlockAttach from "./external-extensions/block-attachment/block-attachment-node";
+import literatureReference from "./external-extensions/literature-reference/reference-node";
+import literatureReferenceItem from "./external-extensions/literature-reference/reference-item-node";
 
 export default {
   title: "Editor",
@@ -34,6 +36,23 @@ Default.args = {
   defaultValue: `# Welcome
 
 Just an easy to use **Markdown** editor with \`slash commands\``,
+};
+
+export const Reference = Template.bind({});
+Reference.args = {
+  extensions: [new literatureReference(), new literatureReferenceItem()],
+  defaultValue: `
+# 文献引用
+
+原始的投入产出分析<ref name="Miller"/> 是用于分析经济产品。
+
+全球投入产出表，并且包含环境的数据，可以从这里获得进一步信息<ref name="Dietzenbacher:Data"/>。
+
+<references>
+<ref name="Miller"> Miller, R., & Blair, P. (2009). Input–output analysis: Foundations and extensions (2nd ed.). Cambridge, UK: Cambridge University Press.</ref>
+<ref name="Dietzenbacher:Data"> Arnold Tukker & Erik Dietzenbacher (2013) GLOBAL MULTIREGIONAL INPUT–OUTPUT FRAMEWORKS: AN INTRODUCTION AND OUTLOOK, Economic Systems Research, 25:1, 1-19, DOI: 10.1080/09535314.2012.761179 </ref>
+</references>
+  `,
 };
 
 export const BlockAttachment = Template.bind({});
