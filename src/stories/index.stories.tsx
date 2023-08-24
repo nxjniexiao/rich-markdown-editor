@@ -41,6 +41,17 @@ Just an easy to use **Markdown** editor with \`slash commands\``,
 
 export const Reference = Template.bind({});
 Reference.args = {
+  readOnly: true,
+  onClickLink: (href: string) => {
+    let openInNewTab = true;
+    try {
+      const url = new URL(href);
+      if (url.hash.startsWith("#literature")) {
+        openInNewTab = false;
+      }
+    } catch (_) {}
+    openInNewTab ? window.open(href, "_blank") : (window.location.href = href);
+  },
   extensions: [
     new literatureReference(),
     new literatureReferenceItem(),
@@ -49,12 +60,55 @@ Reference.args = {
   defaultValue: `
 # 文献引用
 
-原始的投入产出分析<ref name="Miller"/> 是用于分析经济产品。
+原始的投入产出分析1<ref name="Miller"/><ref name="Davis"/> 是用于分析经济产品2<ref name="Miller"/>。
+
+1
+
+2
+
+原始的投入产出分析3<ref name="Miller"/> 是2<ref name="Davis"/>
+
+3
+
+4
+
+5
+
+原始的投入产出分析4<ref name="Miller"/> 是3<ref name="Davis"/>
+
+6
+
+7
+
+8
+
+9
 
 全球投入产出表，并且包含环境的数据，可以从这里获得进一步信息<ref name="Dietzenbacher:Data"/>。
 
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+## 参考文献
+
 <references>
 <ref name="Miller"> Miller, R., & Blair, P. (2009). Input–output analysis: Foundations and extensions (2nd ed.). Cambridge, UK: Cambridge University Press.</ref>
+<ref name="Davis"> Davis S. & Caldeira K. (2010). Consumption-based accounting of CO2 emmissions. PNAS 107(12):5687-5692.</ref>
 <ref name="Dietzenbacher:Data"> Arnold Tukker & Erik Dietzenbacher (2013) GLOBAL MULTIREGIONAL INPUT–OUTPUT FRAMEWORKS: AN INTRODUCTION AND OUTLOOK, Economic Systems Research, 25:1, 1-19, DOI: 10.1080/09535314.2012.761179 </ref>
 </references>
   `,
