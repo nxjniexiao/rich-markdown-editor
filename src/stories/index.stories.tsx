@@ -7,6 +7,7 @@ import Attach from "./external-extensions/attachment/attachment-node";
 import BlockAttach from "./external-extensions/block-attachment/block-attachment-node";
 import literatureReference from "./external-extensions/literature-reference/reference-node";
 import literatureReferenceItem from "./external-extensions/literature-reference/reference-item-node";
+import Ref from "./external-extensions/literature-reference/ref-node";
 
 export default {
   title: "Editor",
@@ -40,7 +41,11 @@ Just an easy to use **Markdown** editor with \`slash commands\``,
 
 export const Reference = Template.bind({});
 Reference.args = {
-  extensions: [new literatureReference(), new literatureReferenceItem()],
+  extensions: [
+    new literatureReference(),
+    new literatureReferenceItem(),
+    new Ref(),
+  ],
   defaultValue: `
 # 文献引用
 
