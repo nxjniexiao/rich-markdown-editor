@@ -121,11 +121,19 @@ BlockAttachment.args = {
 # 自定义块级附件
 
 块级附件
-{{cmap: 123}}
+{{cmap: 9379ed9e-89f1-4196-8280-0881891d8ce8}}
 
 附件2
 
-{{cmap: 456}}
+{{cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12}}
+
+附件3 有高度
+
+{{cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|auto|100px}}
+
+附件3 有宽高
+
+{{cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|150.5px|100px}}
 `,
 };
 

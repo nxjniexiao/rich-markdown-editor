@@ -1,14 +1,18 @@
 import MarkdownIt from "markdown-it";
 
-const BLOCK_ATTACHMENT_REGEX = /^\{\{(cmap): ([0-9a-f\-]*)\}\}/;
+const BLOCK_ATTACHMENT_REGEX = /^\{\{(cmap):\s?([0-9a-f\-]*)([A-Za-z0-9\.\|]+)?\}\}/;
 
 export default function markdownItBlockAttachment(md: MarkdownIt): void {
   function renderAttachment(tokens, idx) {
     const token = tokens[idx];
     const type = token.attrGet("type");
     const id = token.attrGet("id");
+    const width = token.attrGet("width");
+    const height = token.attrGet("height");
 
-    return `{{${type}: ${id}}}`;
+    const size = width && height ? `|${width}|${height}` : "";
+
+    return `{{${type}: ${id}${size}}}`;
   }
 
   md.renderer.rules.block_attachment = renderAttachment;
@@ -38,10 +42,20 @@ function block_attachment(state, start, end, silent) {
 
     const type = match[1];
     const id = match[2];
+    const size = match[3];
     const token = state.push("block_attachment", "div", 0);
     token.content = match[0];
+    let width = "";
+    let height = "";
+    if (size) {
+      const arr = size.split("|");
+      width = arr[1] || "";
+      height = arr[2] || "";
+    }
     token.attrPush(["type", type]);
     token.attrPush(["id", id]);
+    token.attrPush(["width", width]);
+    token.attrPush(["height", height]);
 
     state.line = state.line + 1;
 

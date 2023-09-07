@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import Node from "../../../nodes/Node";
 import markdownItBlockAttachment from "./block-attachment-rule";
 
@@ -19,6 +19,12 @@ export default class Attachment extends Node {
         id: {
           default: "", // block attachment id
         },
+        width: {
+          default: "",
+        },
+        height: {
+          default: "",
+        },
       },
       parseDOM: [
         {
@@ -26,7 +32,9 @@ export default class Attachment extends Node {
           getAttrs: (dom: HTMLIFrameElement) => {
             const type = dom.getAttribute("data-type") || "";
             const id = dom.getAttribute("data-id") || "";
-            return { type, id };
+            const width = dom.getAttribute("data-width") || "";
+            const height = dom.getAttribute("data-height") || "";
+            return { type, id, width, height };
           },
         },
       ],
@@ -36,6 +44,8 @@ export default class Attachment extends Node {
           class: this.name,
           "data-type": node.attrs.type,
           "data-id": node.attrs.id,
+          "data-width": node.attrs.width,
+          "data-height": node.attrs.height,
         },
         0,
       ],
@@ -54,8 +64,10 @@ export default class Attachment extends Node {
 
   // 序列化为 markdown 时使用
   toMarkdown(state, node) {
+    const { type, id, width, height } = node.attrs;
+    const size = width && height ? `|${width}|${height}` : "";
     state.ensureNewLine();
-    state.write(`{{${node.attrs.type}: ${node.attrs.id}}}`);
+    state.write(`{{${type}: ${id}${size}}}`);
     state.closeBlock(node);
   }
 
@@ -74,6 +86,8 @@ export default class Attachment extends Node {
       getAttrs: tok => ({
         type: tok.attrGet("type"),
         id: tok.attrGet("id"),
+        width: tok.attrGet("width"),
+        height: tok.attrGet("height"),
       }),
     };
   }
@@ -81,8 +95,13 @@ export default class Attachment extends Node {
 
 function BlockAttachmentComp(props) {
   const { isSelected } = props;
-  const { type, id } = props.node.attrs;
+  const { type, id, width, height } = props.node.attrs;
   const [attachmentData, setAttachmentData] = React.useState<any>({});
+
+  const style: CSSProperties = { background: "skyblue" };
+
+  if (width) style.width = width;
+  if (height) style.height = height;
 
   const allowDrag = e => {
     // prevent default to allow drop
@@ -101,6 +120,7 @@ function BlockAttachmentComp(props) {
       className={`block-attachment ${
         isSelected ? " ProseMirror-selectednode" : ""
       }`}
+      style={style}
       onDragOver={allowDrag}
     >
       {attachmentData.name}
