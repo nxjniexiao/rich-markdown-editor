@@ -249,9 +249,21 @@ export default class Image extends Node {
   };
 
   component = props => {
-    const { theme, isSelected } = props;
+    const { theme, isSelected, getPos } = props;
     const { alt, src, title, layoutClass } = props.node.attrs;
     const className = layoutClass ? `image image-${layoutClass}` : "image";
+    const onLoad = () => {
+      const { view } = this.editor;
+      view.dispatch(
+        view.state.tr.setMeta("load-image", { pos: getPos(), succeed: true })
+      );
+    };
+    const onError = () => {
+      const { view } = this.editor;
+      view.dispatch(
+        view.state.tr.setMeta("load-image", { pos: getPos(), succeed: false })
+      );
+    };
 
     return (
       <div contentEditable={false} className={className}>
@@ -270,6 +282,8 @@ export default class Image extends Node {
               src,
               alt,
               title,
+              onLoad,
+              onError,
             }}
             defaultStyles={{
               overlay: {

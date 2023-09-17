@@ -8,6 +8,7 @@ import BlockAttach from "./external-extensions/block-attachment/block-attachment
 import literatureReference from "./external-extensions/literature-reference/reference-node";
 import literatureReferenceItem from "./external-extensions/literature-reference/reference-item-node";
 import Ref from "./external-extensions/literature-reference/ref-node";
+import OnLoad from "./external-extensions/on-load";
 
 export default {
   title: "Editor",
@@ -384,6 +385,7 @@ Placeholder.args = {
 
 export const Images = Template.bind({});
 Images.args = {
+  extensions: [new OnLoad()],
   defaultValue: `# Images
 ![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg)`,
 };
