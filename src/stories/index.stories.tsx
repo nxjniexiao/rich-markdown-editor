@@ -156,6 +156,32 @@ Attachment.args = {
 `,
 };
 
+export const OnLoadProps = Template.bind({});
+OnLoadProps.args = {
+  extensions: [
+    new Attach(),
+    new OnLoad({
+      onLoad: () => {
+        const root = document.querySelector("#root");
+        console.log(
+          `width: ${root?.offsetWidth}; height: ${root?.offsetHeight}`
+        );
+      },
+    }),
+  ],
+  defaultValue: `# OnLoad
+
+附件[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]，cmap[[cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12]]，词条[[word: b516f615-00ca-4e4d-b24d-1d44179d3167]]。
+
+![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg)
+
+当 $a \\ne 0$ 时，$(ax^2 + bx + c = 0)$ 有两个解，它们是：
+
+$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$
+
+`,
+};
+
 export const Color = Template.bind({});
 Color.args = {
   defaultValue: `
@@ -385,7 +411,6 @@ Placeholder.args = {
 
 export const Images = Template.bind({});
 Images.args = {
-  extensions: [new OnLoad()],
   defaultValue: `# Images
 ![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg)`,
 };

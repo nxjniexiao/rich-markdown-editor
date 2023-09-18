@@ -87,6 +87,9 @@ export class MathView implements NodeView {
     this.addFakeCursor();
     this.dom.classList.remove("editing");
     this.renderMath();
+    requestAnimationFrame(() => {
+      view.dispatch(view.state.tr.setMeta("load-math", { pos: getPos() }));
+    });
 
     const unFocus = () => {
       this.dom.classList.remove("editing");

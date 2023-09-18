@@ -50,7 +50,7 @@ export default class OnLoad extends Extension {
               }
               loaded = images.loaded && math.loaded && inlineAttachments.loaded;
               if (loaded) {
-                this.options?.onLoad();
+                this.options.onLoad?.();
               }
               return loaded;
             }

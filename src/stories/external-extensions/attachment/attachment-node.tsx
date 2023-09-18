@@ -45,7 +45,7 @@ export default class Attachment extends Node {
   }
 
   component = props => {
-    return <AttachmentComp {...props} />;
+    return <AttachmentComp {...props} editor={this.editor} />;
   };
 
   // 序列化为 markdown 时使用
@@ -78,7 +78,8 @@ export default class Attachment extends Node {
 }
 
 function AttachmentComp(props) {
-  const { type, id } = props.node.attrs;
+  const { editor, node, getPos } = props;
+  const { type, id } = node.attrs;
   const [attachmentData, setAttachmentData] = React.useState<any>({});
 
   const handleClick = () => {
@@ -90,6 +91,13 @@ function AttachmentComp(props) {
     // api request
     setAttachmentData({
       name: "文件名",
+    });
+    requestAnimationFrame(() => {
+      editor.view.dispatch(
+        editor.view.state.tr.setMeta("load-inline-attachment", {
+          pos: getPos(),
+        })
+      );
     });
   }, [type, id]);
 
