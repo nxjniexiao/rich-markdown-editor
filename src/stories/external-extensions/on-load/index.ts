@@ -7,6 +7,7 @@ export default class OnLoad extends Extension {
   }
 
   get plugins() {
+    let noItemsToWaitForLoading = false;
     let loaded = false; // all loaded flag
     const images = new LoadStatus(); // image load status
     const math = new LoadStatus(); // math load status
@@ -14,6 +15,15 @@ export default class OnLoad extends Extension {
 
     return [
       new Plugin({
+        view: () => {
+          // When there are no images/math/attachments to load, call onLoad with a delay.
+          if (noItemsToWaitForLoading) {
+            setTimeout(() => {
+              this.options.onLoad?.();
+            }, 10);
+          }
+          return {};
+        },
         state: {
           init: (config, state) => {
             state.doc.descendants((node, pos) => {
@@ -33,6 +43,7 @@ export default class OnLoad extends Extension {
             math.updateLoaded();
             inlineAttachments.updateLoaded();
             loaded = images.loaded && math.loaded && inlineAttachments.loaded;
+            noItemsToWaitForLoading = loaded;
 
             return loaded;
           },
