@@ -9,6 +9,7 @@ import literatureReference from "./external-extensions/literature-reference/refe
 import literatureReferenceItem from "./external-extensions/literature-reference/reference-item-node";
 import Ref from "./external-extensions/literature-reference/ref-node";
 import OnLoad from "./external-extensions/on-load";
+import IME from "./external-extensions/ime";
 
 export default {
   title: "Editor",
@@ -38,6 +39,14 @@ Default.args = {
   defaultValue: `# Welcome
 
 Just an easy to use **Markdown** editor with \`slash commands\``,
+};
+
+export const InputMethod = Template.bind({});
+InputMethod.args = {
+  extensions: [new IME()],
+  defaultValue: `# IME
+
+试用输入法输入时不触发onChange。`,
 };
 
 export const Reference = Template.bind({});

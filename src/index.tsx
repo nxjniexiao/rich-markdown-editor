@@ -569,6 +569,10 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           transaction
         );
 
+        const hasIMEPlugin = state.plugins.some(
+          plugin => plugin.key.indexOf("ime") > -1
+        );
+
         this.updateState(state);
 
         // If any of the transactions being dispatched resulted in the doc
@@ -581,6 +585,13 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
               transactions.some(isEditingCheckbox)))
         ) {
           if (!self.view) self.view = this; // fix: throw err when init a doc with folded content, as this.view is undefined.
+          // Doesn't trigger handleChange when composing
+          if (!(hasIMEPlugin && this.composing)) {
+            self.handleChange();
+          }
+        }
+        // Trigger handleChange when compositionend
+        if (hasIMEPlugin && transaction.getMeta("compositionend")) {
           self.handleChange();
         }
 
