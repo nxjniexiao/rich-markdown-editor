@@ -127,6 +127,7 @@ export type Props = {
     | "th"
     | "tr"
     | "emoji"
+    | "folding"
   )[];
   autoFocus?: boolean;
   readOnly?: boolean;
@@ -351,6 +352,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
             dictionary,
             onShowToast: this.props.onShowToast,
             offset: this.props.headingsOffset,
+            disableFolding: this.props.disableExtensions?.includes("folding"),
           }),
           new HorizontalRule(),
           new Image({

@@ -41,6 +41,14 @@ Default.args = {
 Just an easy to use **Markdown** editor with \`slash commands\``,
 };
 
+export const DisableFolding = Template.bind({});
+DisableFolding.args = {
+  disableExtensions: ["folding"],
+  defaultValue: `# Disable folding
+
+Just an easy to use **Markdown** editor with \`slash commands\``,
+};
+
 export const InputMethod = Template.bind({});
 InputMethod.args = {
   extensions: [new IME()],

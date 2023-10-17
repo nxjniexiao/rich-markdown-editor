@@ -45,6 +45,7 @@ export default class Heading extends Node {
         contentElement: ".heading-content",
       })),
       toDOM: node => {
+        const disableFolding = this.options.disableFolding;
         const anchor = document.createElement("button");
         anchor.innerText = "#";
         anchor.type = "button";
@@ -74,7 +75,7 @@ export default class Heading extends Node {
               }`,
             },
             anchor,
-            fold,
+            disableFolding ? "" : fold,
           ],
           [
             "span",
