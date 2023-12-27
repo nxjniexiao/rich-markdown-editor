@@ -302,6 +302,10 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     }
   }
 
+  componentWillUnmount(): void {
+    this.view.destroy();
+  }
+
   init() {
     this.extensions = this.createExtensions();
     this.nodes = this.createNodes();
