@@ -1,6 +1,6 @@
 import { EditorState, Plugin, Transaction } from "prosemirror-state";
 import { InputRule } from "prosemirror-inputrules";
-import { MathView } from "../node-views/math-view";
+import { MathView } from "../node-views/mathjax-view";
 import Node from "./Node";
 
 export default class InlineMath extends Node {

@@ -8,7 +8,7 @@ import tablesRule from "../rules/tables";
 import noticesRule from "../rules/notices";
 import underlinesRule from "../rules/underlines";
 import emojiRule from "../rules/emoji";
-import MathRule from "../rules/katex";
+import MathRule from "../rules/mathjax";
 import BackgroundColorRule from "../rules/backgroundColor";
 
 const defaultRules = [
