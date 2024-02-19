@@ -228,7 +228,7 @@ $$a \\ne 0$$
 $$x = {-b 
 \\pm 
 \\sqrt
-{b^2-4ac} \\over 2a}$$
+{b^2-4ac} \\over 2a}\\text{文字}$$
 `,
 };
 

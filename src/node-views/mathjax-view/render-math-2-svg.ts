@@ -21,7 +21,7 @@ export function renderMath2SVG(math: string, inline: boolean): string {
     const adaptor = browserAdaptor();
     const handler = RegisterHTMLHandler(adaptor);
     AssistiveMmlHandler(handler);
-    const mathDocument = mathjax.document(content, documentOptions);
+    const mathDocument = mathjax.document(window.document, documentOptions);
     convertOptions.display = !inline;
     const svg = mathDocument.convert(content, convertOptions);
     const html = adaptor.outerHTML(svg);
