@@ -7,10 +7,6 @@ import { AllPackages } from "mathjax-full/js/input/tex/AllPackages.js";
 import { AssistiveMmlHandler } from "mathjax-full/js/a11y/assistive-mml.js";
 import juice from "juice/client";
 
-const documentOptions = {
-  InputJax: new TeX({ packages: AllPackages }),
-  OutputJax: new SVG({ fontCache: "none" }),
-};
 const convertOptions = {
   display: false,
 };
@@ -21,7 +17,11 @@ export function renderMath2SVG(math: string, inline: boolean): string {
     const adaptor = browserAdaptor();
     const handler = RegisterHTMLHandler(adaptor);
     AssistiveMmlHandler(handler);
-    const mathDocument = mathjax.document(window.document, documentOptions);
+    const documentOptions = {
+      InputJax: new TeX({ packages: AllPackages }),
+      OutputJax: new SVG({ fontCache: "none" }),
+    };
+    const mathDocument = mathjax.document(document, documentOptions);
     convertOptions.display = !inline;
     const svg = mathDocument.convert(content, convertOptions);
     const html = adaptor.outerHTML(svg);
