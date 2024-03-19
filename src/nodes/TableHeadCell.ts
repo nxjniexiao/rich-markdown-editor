@@ -13,15 +13,33 @@ export default class TableHeadCell extends Node {
       content: "paragraph+",
       tableRole: "header_cell",
       isolating: true,
-      parseDOM: [{ tag: "th" }],
+      parseDOM: [
+        {
+          tag: "th",
+          getAttrs: (dom: HTMLElement) => {
+            const attrs: { [key: string]: any } = {};
+            const colspan = parseInt(dom.getAttribute("colspan") || "");
+            const rowspan = parseInt(dom.getAttribute("rowspan") || "");
+            const style = dom.getAttribute("style");
+            const matches = /text-align: (left|right)/.exec(style || "");
+            const alignment = matches?.[1];
+
+            if (!isNaN(colspan)) attrs.colspan = colspan;
+            if (!isNaN(rowspan)) attrs.rowspan = rowspan;
+            if (alignment) attrs.alignment = alignment;
+            return attrs;
+          },
+        },
+      ],
       toDOM(node) {
-        return [
-          "th",
-          node.attrs.alignment
-            ? { style: `text-align: ${node.attrs.alignment}` }
-            : {},
-          0,
-        ];
+        const attrs: { [key: string]: any } = {};
+        const { colspan, rowspan, alignment } = node.attrs;
+
+        if (colspan !== 1) attrs.colspan = colspan;
+        if (rowspan !== 1) attrs.rowspan = rowspan;
+        if (alignment) attrs.style = `text-align: ${alignment}`;
+
+        return ["th", attrs, 0];
       },
       attrs: {
         colspan: { default: 1 },
@@ -38,7 +56,10 @@ export default class TableHeadCell extends Node {
   parseMarkdown() {
     return {
       block: "th",
-      getAttrs: tok => ({ alignment: tok.info }),
+      getAttrs: tok => {
+        const { colspan, rowspan, alignment } = tok.meta;
+        return { colspan, rowspan, alignment };
+      },
     };
   }
 

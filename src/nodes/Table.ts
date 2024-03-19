@@ -9,7 +9,9 @@ import {
   fixTables,
   goToNextCell,
   isInTable,
+  mergeCells,
   setCellAttr,
+  splitCell,
   tableEditing,
   toggleHeaderCell,
   toggleHeaderColumn,
@@ -22,6 +24,7 @@ import {
   moveRow,
 } from "prosemirror-utils";
 import { Plugin, TextSelection } from "prosemirror-state";
+import multimdTable from "../rules/tablesOfMultimd";
 import tablesRule from "../rules/tables";
 
 export default class Table extends Node {
@@ -51,7 +54,7 @@ export default class Table extends Node {
   }
 
   get rulePlugins() {
-    return [tablesRule];
+    return [multimdTable, tablesRule];
   }
 
   commands({ schema }) {
@@ -95,6 +98,8 @@ export default class Table extends Node {
       toggleHeaderCell: () => toggleHeaderCell,
       setCellAttr: () => setCellAttr,
       fixTables: () => fixTables,
+      merge_cells: () => mergeCells,
+      split_cell: () => splitCell,
     };
   }
 

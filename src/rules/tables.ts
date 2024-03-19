@@ -66,12 +66,16 @@ export default function markdownTables(md: MarkdownIt): void {
         // but prosemirror requires them, so we add 'em in here.
         tokens.splice(i + 1, 0, new Token("paragraph_open", "p", 1));
 
-        // markdown-it table parser stores alignment as html styles, convert
-        // to a simple string here
-        const tokenAttrs = tokens[i].attrs;
-        if (tokenAttrs) {
-          const style = tokenAttrs[0][1];
-          tokens[i].info = style.split(":")[1];
+        // parse 'colspan', 'rowspan' and 'alignment' attrs of table cell
+        const token = tokens[i];
+        const colspan = token.attrGet("colspan");
+        const rowspan = token.attrGet("rowspan");
+        const style = token.attrGet("style");
+        token.meta = {};
+        if (colspan) token.meta.colspan = colspan;
+        if (rowspan) token.meta.rowspan = rowspan;
+        if (style) {
+          token.meta.alignment = style.split(":")[1];
         }
       }
 

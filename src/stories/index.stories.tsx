@@ -326,6 +326,18 @@ Simple tables with alignment and row/col editing are supported, they can be inse
 `,
 };
 
+export const TablesWithMergedCells = Template.bind({});
+TablesWithMergedCells.args = {
+  defaultValue: `# Tables with merged cells
+
+| Editor      | Rank | React | Collaborative |
+|-------------|------|-------|--------------:|
+| Prosemirror | Long cell   ||           Yes |
+| Slate       | B    |  Yes  |            No |
+| ^^          | C    |   No  |           Yes |
+`,
+};
+
 export const Marks = Template.bind({});
 Marks.args = {
   defaultValue: `This document shows the variety of marks available, most can be accessed through the formatting menu by selecting text or by typing out the Markdown manually.
