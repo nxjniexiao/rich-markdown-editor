@@ -330,11 +330,45 @@ export const TablesWithMergedCells = Template.bind({});
 TablesWithMergedCells.args = {
   defaultValue: `# Tables with merged cells
 
-| Editor      | Rank | React | Collaborative |
-|-------------|------|-------|--------------:|
-| Prosemirror | Long cell   ||           Yes |
-| Slate       | B    |  Yes  |            No |
-| ^^          | C    |   No  |           Yes |
+## Multiple columns spanned, without leading pipes
+
+|               |          Grouping           ||
+| First Header  | Second Header | Third Header |
+| ------------- | :-----------: | -----------: |
+| Content       |          *Long Cell*        ||
+| Content       |   **Cell**    |         Cell |
+
+## Empty table cells at headers and data rows
+
+|             |                             ||
+|             | Second Header | Third Header |
+| ----------- | :-----------: | -----------: |
+| Content     |                             ||
+|             |               |         Cell |
+
+## Rowspan and colspan in one table cell
+
+| A                |||
+|------|------|------|
+| B    | C    | D    |
+| ^^   | E    | F    |
+| G          || H    |
+| ^^         || I    |
+| ^^         || J    |
+
+## Rowspan and colspan in one table cell base case
+
+|    |    |    |
+|----|----|----|
+| A  | B      ||
+| C  | ^^     ||
+
+## Rowspan at first line
+
+| ^^   | A    | B    |
+|------|------|------|
+| ^^   | C    | D    |
+| ^^   | E    | F    |
 `,
 };
 

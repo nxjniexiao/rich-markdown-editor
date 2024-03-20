@@ -303,18 +303,68 @@ export class MarkdownSerializerState {
   renderTable(node) {
     this.flushClose(1);
 
-    let headerBuffer = "";
+    // last separator between table header and table content
+    let lastSeparator = "";
     const prevTable = this.inTable;
     this.inTable = true;
 
     // ensure there is an empty newline above all tables
     this.out += "\n";
 
+    // missing cells due to merging of multi-row cells
+    /**
+     * @type {{[rowIdx: string]: Array.<{ colIdx: number; colspan: number }>}}
+     */
+    const missingMultiRowCells = {};
     // rows
     node.forEach((row, _, i) => {
+      // separator between table header and table content
+      let separator = "";
+      // actualJ: the actual col index of the cell.
+      // considering the merged cells, actualJ may be larger than J.
+      let actualJ = 0;
+      // missing cells of current row (calculated by rows above current row)
+      const missingCells = missingMultiRowCells[i];
+      missingCells?.sort((c1, c2) => c1.colIdx - c2.colIdx);
       // cols
       row.forEach((cell, _, j) => {
-        this.out += j === 0 ? "| " : " | ";
+        // add separator between table header and table content
+        const cellTypeName = cell.type.name;
+        if (lastSeparator && cellTypeName !== "th") {
+          this.out += lastSeparator;
+          lastSeparator = undefined;
+        }
+
+        if (j === 0) this.out += "| ";
+
+        const rowspan = cell.attrs.rowspan;
+        const colspan = cell.attrs.colspan || 1;
+
+        // 1.add missing cells
+        while (missingCells?.length > 0 && missingCells[0].colIdx <= actualJ) {
+          const missingCell = missingCells.shift();
+          let cellContent = "^^ ";
+          for (let ii = 0; ii < missingCell.colspan; ii++) {
+            cellContent += "|";
+          }
+          cellContent += " ";
+          this.out += cellContent;
+          actualJ += missingCell.colspan;
+        }
+
+        // 2.handle cell with rowspan greater than 1
+        if (rowspan > 1) {
+          for (let ii = 1; ii < rowspan; ii++) {
+            let rowIdx = i + ii;
+            if (!missingMultiRowCells[rowIdx]) {
+              missingMultiRowCells[rowIdx] = [];
+            }
+            missingMultiRowCells[rowIdx].push({
+              colIdx: actualJ,
+              colspan,
+            });
+          }
+        }
 
         cell.forEach(para => {
           // just padding the output so that empty cells take up the same space
@@ -329,24 +379,48 @@ export class MarkdownSerializerState {
           }
         });
 
-        if (i === 0) {
+        // 3.handle cell with colspan greater than 1
+        actualJ += colspan;
+        let delimiter = " ";
+        for (let ii = 0; ii < colspan; ii++) {
+          delimiter += "|";
+        }
+        delimiter += " ";
+        this.out += delimiter;
+
+        if (cellTypeName === "th") {
+          let currSeparator;
           if (cell.attrs.alignment === "center") {
-            headerBuffer += "|:---:";
+            currSeparator = "|:---:";
           } else if (cell.attrs.alignment === "left") {
-            headerBuffer += "|:---";
+            currSeparator = "|:---";
           } else if (cell.attrs.alignment === "right") {
-            headerBuffer += "|---:";
+            currSeparator = "|---:";
           } else {
-            headerBuffer += "|----";
+            currSeparator = "|----";
+          }
+          for (let ii = 0; ii < colspan; ii++) {
+            separator += currSeparator;
           }
         }
       });
 
-      this.out += " |\n";
+      // 4.add missing cells at the end of row
+      let missingCell;
+      while ((missingCell = missingCells?.shift())) {
+        let cellContent = "^^ ";
+        for (let ii = 0; ii < missingCell.colspan; ii++) {
+          cellContent += "|";
+        }
+        cellContent += " ";
+        this.out += cellContent;
+      }
 
-      if (headerBuffer) {
-        this.out += `${headerBuffer}|\n`;
-        headerBuffer = undefined;
+      this.out += "\n";
+
+      if (separator) {
+        separator += `|\n`;
+        lastSeparator = separator;
       }
     });
 
