@@ -34,8 +34,29 @@ export default function formattingMenuItems(
   const isTable = isInTable(state);
   const isList = isInList(state);
   const allowBlocks = !isTable && !isList;
-  const allowMergeCells = true; // TODO:
-  const allowSplitCell = true; // TODO:
+  const allowMergeCells = isTable;
+  const allowSplitCell = isTable;
+
+  let tableCellsOp: MenuItem[] = [];
+  if (allowMergeCells || allowMergeCells) {
+    tableCellsOp = [
+      {
+        name: "separator",
+      },
+      {
+        name: "merge_cells",
+        tooltip: dictionary.mergeCells,
+        icon: TableIcon,
+        visible: allowMergeCells,
+      },
+      {
+        name: "split_cell",
+        tooltip: dictionary.splitCell,
+        icon: TableIcon,
+        visible: allowSplitCell,
+      },
+    ];
+  }
 
   return [
     {
@@ -164,20 +185,6 @@ export default function formattingMenuItems(
       active: isMarkActive(schema.marks.link),
       attrs: { href: "" },
     },
-    {
-      name: "separator",
-    },
-    {
-      name: "merge_cells",
-      tooltip: dictionary.mergeCells,
-      icon: TableIcon,
-      visible: allowMergeCells,
-    },
-    {
-      name: "split_cell",
-      tooltip: dictionary.splitCell,
-      icon: TableIcon,
-      visible: allowSplitCell,
-    },
+    ...tableCellsOp,
   ];
 }
