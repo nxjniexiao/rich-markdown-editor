@@ -366,7 +366,7 @@ export class MarkdownSerializerState {
           }
         }
 
-        cell.forEach(para => {
+        cell.forEach((para, offset, idx) => {
           // just padding the output so that empty cells take up the same space
           // as headings.
           // TODO: Ideally we'd calc the longest cell length and use that
@@ -376,6 +376,9 @@ export class MarkdownSerializerState {
           } else {
             this.closed = false;
             this.render(para, row, j);
+            if (cell.childCount > 1 && idx < cell.childCount - 1) {
+              this.out += " \\n ";
+            }
           }
         });
 

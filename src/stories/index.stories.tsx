@@ -321,7 +321,7 @@ Simple tables with alignment and row/col editing are supported, they can be inse
 | Editor      | Rank | React | Collaborative |
 |-------------|------|-------|--------------:|
 | Prosemirror | A    |   No  |           Yes |
-| Slate       | B    |  Yes  |            No |
+| Slate       | B    |  Yes  |     No \\n No |
 | CKEdit      | C    |   No  |           Yes |
 `,
 };
