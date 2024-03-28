@@ -2,7 +2,7 @@
 /* eslint-disable */
 import { DFA } from "../lib/dfa.js";
 
-export default function multimd_table_plugin(md, options) {
+export default function multimd_table_plugin(md, options?) {
   var defaults = {
     multiline:  false,
     rowspan:    true,
