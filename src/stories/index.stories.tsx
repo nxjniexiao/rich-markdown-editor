@@ -41,6 +41,19 @@ Default.args = {
 Just an easy to use **Markdown** editor with \`slash commands\``,
 };
 
+export const HTML = Template.bind({});
+HTML.args = {
+  defaultValue: `# HTML
+
+<div>
+  <div>123</div>
+  <div style="color:skyblue;">456</div>
+</div>
+
+HTML
+`,
+};
+
 export const DisableFolding = Template.bind({});
 DisableFolding.args = {
   disableExtensions: ["folding"],
