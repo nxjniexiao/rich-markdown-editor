@@ -8,6 +8,7 @@ import {
   deleteSelection,
   newlineInCode,
 } from "prosemirror-commands";
+import { sanitizeBlockHtml } from "./sanitize-html";
 import { GetPos, isMacOS } from "./types";
 
 import "./style.css";
@@ -182,8 +183,9 @@ export class HTMLView implements NodeView {
   }
 
   renderHTML() {
-    const content = this.node.attrs.content;
-    this.htmlContent.innerHTML = content.trim() || "...";
+    const content = this.node.attrs.content.trim() || "...";
+    const safeContent = sanitizeBlockHtml(content);
+    this.htmlContent.innerHTML = safeContent;
   }
 
   destroy() {
