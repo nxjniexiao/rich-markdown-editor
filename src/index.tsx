@@ -59,6 +59,7 @@ import TableRow from "./nodes/TableRow";
 import MathInline from "./nodes/MathInline";
 import MathBlock from "./nodes/MathBlock";
 import HTMLBlock from "./nodes/HTMLBlock";
+import HTMLInline from "./nodes/HTMLInline";
 
 // marks
 import Bold from "./marks/Bold";
@@ -384,6 +385,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           new MathBlock(),
           new MathInline(),
           new HTMLBlock(),
+          new HTMLInline(),
           new Italic(),
           new TemplatePlaceholder(),
           new Underline(),

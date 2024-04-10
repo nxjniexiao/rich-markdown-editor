@@ -45,12 +45,18 @@ export const HTML = Template.bind({});
 HTML.args = {
   defaultValue: `# HTML
 
+## HTML block
+
 <div>
   <div>123</div>
   <div style="color:skyblue;">456</div>
 </div>
 
-HTML
+## HTML inline
+
+This span is <span style="background:skyblue">an <span style="border:1px solid red">inline-level</span> element</span>; its background 
+has been <span style="background:skyblue">colored</span> to <span style="color: tomato">display</span> both the beginning and
+<em>end <span style="border: 1px solid #ccc;"> of **the** element's</span> influence</strong>.
 `,
 };
 
