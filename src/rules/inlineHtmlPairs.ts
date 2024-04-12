@@ -1,7 +1,7 @@
 import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token";
 
-const validInlineHtmlPairs = new Set([
+export const validInlineHtmlPairs = [
   "a",
   "span",
   "strong",
@@ -21,7 +21,8 @@ const validInlineHtmlPairs = new Set([
   "sup",
   "sub",
   "time",
-]);
+];
+const validInlineHtmlPairsSet = new Set(validInlineHtmlPairs);
 
 const INLINE_HTML_REGEX_START = /^<(\w+)[\s>]/;
 const INLINE_HTML_REGEX_END = /^<\/(\w+)>/;
@@ -45,7 +46,7 @@ export default function inlineHtmlPairs(md: MarkdownIt): void {
 
         if (match) {
           const tag = match[1];
-          const isValidTag = validInlineHtmlPairs.has(tag);
+          const isValidTag = validInlineHtmlPairsSet.has(tag);
           if (isValidTag) {
             let idxArr = validInlineHtmlTokenObj[tag];
             if (!idxArr) {
