@@ -14,6 +14,7 @@ import {
   InsertAboveIcon,
   InsertBelowIcon,
   ReplaceIcon,
+  BackIcon,
 } from "outline-icons";
 import { EditorView } from "prosemirror-view";
 import { NodeType, Slice } from "prosemirror-model";
@@ -173,6 +174,16 @@ export default function sideMenuItems(arg: {
           visible: setBlockType(schema.nodes.math_block)(state),
           onClick: handleSetBlockType,
         },
+        // BLOCK HTML
+        {
+          name: "html_block",
+          title: dictionary.blockHTML,
+          keywords: "Block HTML",
+          icon: BackIcon,
+          active: isNodeActive(schema.nodes.html_block),
+          visible: setBlockType(schema.nodes.html_block)(state),
+          onClick: handleSetBlockType,
+        },
       ],
     },
   ];
@@ -230,6 +241,17 @@ function handleSetBlockType(view: EditorView, onClose: () => void) {
     // fix: change type to blockquote failed
     if (type === schema.nodes.blockquote) {
       wrapIn(type, this.attrs)(view.state, view.dispatch);
+    } else if (type === schema.nodes.html_block) {
+      view.dispatch(
+        view.state.tr
+          .replaceSelectionWith(
+            type.create(
+              { content: `<div>\n${selection.node.textContent}\n</div>` },
+              null
+            )
+          )
+          .scrollIntoView()
+      );
     } else {
       setBlockType(type, this.attrs)(view.state, view.dispatch);
     }

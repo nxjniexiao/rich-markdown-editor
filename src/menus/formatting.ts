@@ -15,6 +15,7 @@ import {
   MathIcon,
   ItalicIcon,
   TableIcon,
+  BackIcon,
 } from "outline-icons";
 import { isInTable } from "prosemirror-tables";
 import { EditorState } from "prosemirror-state";
@@ -112,6 +113,12 @@ export default function formattingMenuItems(
       tooltip: dictionary.equation,
       icon: MathIcon,
       active: isNodeActive(schema.nodes.inline_math),
+    },
+    {
+      name: "html_inline",
+      tooltip: dictionary.html,
+      icon: BackIcon, // NextIcon
+      active: isNodeActive(schema.nodes.inline_html),
     },
     {
       name: "separator",

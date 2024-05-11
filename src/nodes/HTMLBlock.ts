@@ -1,4 +1,9 @@
-import { Plugin } from "prosemirror-state";
+import {
+  EditorState,
+  NodeSelection,
+  Plugin,
+  Transaction,
+} from "prosemirror-state";
 import Node from "./Node";
 import { HTMLView } from "../node-views/html-view";
 
@@ -32,6 +37,25 @@ export default class HTMLBlock extends Node {
         { class: "html_block", "data-content": node.attrs.content },
         0,
       ],
+    };
+  }
+
+  commands({ type /*, schema*/ }) {
+    return attrs => (
+      state: EditorState,
+      dispatch?: (tr: Transaction) => void
+    ) => {
+      if (dispatch) {
+        let tr = state.tr;
+        tr = tr.replaceSelectionWith(
+          type.create({ content: `<div>\n...\n</div>` })
+        );
+        tr = tr.setSelection(
+          NodeSelection.create(tr.doc, tr.selection.$from.before() - 2)
+        );
+        dispatch(tr);
+      }
+      return true;
     };
   }
 

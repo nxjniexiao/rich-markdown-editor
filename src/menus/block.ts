@@ -16,6 +16,7 @@ import {
   InfoIcon,
   LinkIcon,
   MathIcon,
+  BackIcon,
 } from "outline-icons";
 import { MenuItem } from "../types";
 import baseDictionary from "../dictionary";
@@ -101,6 +102,12 @@ export default function blockMenuItems(
       title: dictionary.blockEquation,
       icon: MathIcon,
       keywords: "math",
+    },
+    {
+      name: "html_block",
+      title: dictionary.blockHTML,
+      icon: BackIcon,
+      keywords: "html",
     },
     {
       name: "hr",

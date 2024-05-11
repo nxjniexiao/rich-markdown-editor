@@ -1,4 +1,4 @@
-import { Plugin } from "prosemirror-state";
+import { EditorState, Plugin, Transaction } from "prosemirror-state";
 import Node from "./Node";
 import { HTMLView } from "../node-views/html-view";
 import inlineHtmlPairs from "../rules/inlineHtmlPairs";
@@ -32,6 +32,27 @@ export default class HTMLInline extends Node {
         { class: "html_inline", "data-content": node.attrs.content },
         0,
       ],
+    };
+  }
+
+  commands({ type /*, schema*/ }) {
+    return attrs => (
+      state: EditorState,
+      dispatch?: (tr: Transaction) => void
+    ) => {
+      const node = state.doc.cut(state.selection.from, state.selection.to);
+      const text = node.textContent;
+      if (!text) return false;
+      if (dispatch) {
+        dispatch(
+          state.tr
+            .replaceSelectionWith(
+              type.create({ content: `<span>${text}</span>` }, null)
+            )
+            .scrollIntoView()
+        );
+      }
+      return true;
     };
   }
 
