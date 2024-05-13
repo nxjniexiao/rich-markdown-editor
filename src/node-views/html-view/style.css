@@ -14,6 +14,9 @@
   /* Sequences of white space are collapsed. */
   white-space: normal;
 }
+.html:not(.inline) .html-content {
+  min-height: 1.7em;
+}
 .html.editing .html-content {
   display: none;
 }
