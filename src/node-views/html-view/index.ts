@@ -1,5 +1,6 @@
-import { Node, Schema } from "prosemirror-model";
+import { Node } from "prosemirror-model";
 import { EditorView, NodeView } from "prosemirror-view";
+import { StepMap } from "prosemirror-transform";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { keymap } from "prosemirror-keymap";
 import { undo, redo } from "prosemirror-history";
@@ -70,7 +71,7 @@ export class HTMLView implements NodeView {
 
     const mac = isMacOS();
 
-    const doc = createHTMLEditorDoc(view.state.schema, this.node.attrs.content);
+    const doc = this.node;
     this.innerView = new EditorView(
       { mount: this.htmlEditor },
       {
@@ -80,7 +81,11 @@ export class HTMLView implements NodeView {
             keymap({
               "Mod-a": () => {
                 const { doc, tr } = this.innerView.state;
-                const sel = TextSelection.create(doc, 0, doc.content.size);
+                const sel = TextSelection.create(
+                  doc,
+                  0,
+                  this.node.nodeSize - 2
+                );
                 this.innerView.dispatch(tr.setSelection(sel));
                 return true;
               },
@@ -107,7 +112,7 @@ export class HTMLView implements NodeView {
                   return false;
                 }
                 // default backspace behavior when math node is non-empty
-                if (this.node.attrs.content.length > 0) {
+                if (this.node.textContent.length > 0) {
                   return false;
                 }
                 // otherwise, we want to delete the empty math node and focus the outer view
@@ -134,22 +139,14 @@ export class HTMLView implements NodeView {
   }
 
   update(node: Node) {
-    if (this.node.type !== node.type) return false;
+    if (!node.sameMarkup(this.node)) return false;
     this.node = node;
     this.addFakeCursor();
-    this.renderHTML();
-
-    const newContent = node.attrs.content;
-    const currContent = getContentFromHTMLEditorDoc(this.innerView.state.doc);
-    // we don't need to update inner editor view when the content has not changed
-    if (newContent === currContent) return true;
-
     if (this.innerView) {
       const { state } = this.innerView;
-      const newDoc = createHTMLEditorDoc(state.schema, newContent);
-      const start = newDoc.content.findDiffStart(state.doc.content);
+      const start = node.content.findDiffStart(state.doc.content);
       if (start != null) {
-        const ends = newDoc.content.findDiffEnd(state.doc.content as any);
+        const ends = node.content.findDiffEnd(state.doc.content as any);
         let { a: endA, b: endB } = ends ?? { a: 0, b: 0 };
         const overlap = start - Math.min(endA, endB);
         if (overlap > 0) {
@@ -158,24 +155,27 @@ export class HTMLView implements NodeView {
         }
         this.innerView.dispatch(
           state.tr
-            .replace(start, endB, newDoc.slice(start, endA))
+            .replace(start, endB, node.slice(start, endA))
             .setMeta("fromOutside", true)
         );
       }
     }
+    this.renderHTML();
     return true;
   }
 
   dispatchInner(tr: Transaction) {
-    const { state } = this.innerView.state.applyTransaction(tr);
+    const { state, transactions } = this.innerView.state.applyTransaction(tr);
     this.innerView.updateState(state);
 
-    if (!tr.getMeta("fromOutside") && tr.docChanged) {
+    if (!tr.getMeta("fromOutside")) {
       const outerTr = this.outerView.state.tr;
-      const content = getContentFromHTMLEditorDoc(state.doc);
-      outerTr.setNodeMarkup(this.getPos(), undefined, {
-        content,
-      });
+      const offsetMap = StepMap.offset(this.getPos() + 1);
+      for (let i = 0; i < transactions.length; i += 1) {
+        const { steps } = transactions[i];
+        for (let j = 0; j < steps.length; j += 1)
+          outerTr.step(steps[j].map(offsetMap) as any);
+      }
       if (outerTr.docChanged) {
         this.outerView.dispatch(outerTr);
       }
@@ -183,7 +183,7 @@ export class HTMLView implements NodeView {
   }
 
   renderHTML() {
-    const content = this.node.attrs.content.trim() || "...";
+    const content = this.node.textContent || "...";
     const safeContent = this.inline
       ? sanitizeInlineHtml(content)
       : sanitizeBlockHtml(content);
@@ -231,21 +231,4 @@ export class HTMLView implements NodeView {
     if (htmlDom === this.dom) return;
     this.deselect();
   }
-}
-
-// create inner editor doc by html string
-function createHTMLEditorDoc(schema: Schema, html: string) {
-  const doc = schema.nodeFromJSON({
-    type: "html_block",
-    content: html ? [{ type: "text", text: html }] : [],
-  });
-
-  return doc;
-}
-
-// get content from html editor doc
-function getContentFromHTMLEditorDoc(doc: Node) {
-  const content = doc.textContent;
-
-  return content;
 }

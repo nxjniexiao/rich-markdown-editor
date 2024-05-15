@@ -1,5 +1,5 @@
 import sanitizeHtml from "sanitize-html";
-import { validInlineHtmlPairs } from "../../rules/inlineHtmlPairs";
+import { validInlineHtmlPairs } from "../../rules/html";
 
 const defaultOptionsForBlockHtml = {
   allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "iframe"]),

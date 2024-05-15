@@ -1,7 +1,7 @@
 import { EditorState, Plugin, Transaction } from "prosemirror-state";
 import Node from "./Node";
 import { HTMLView } from "../node-views/html-view";
-import inlineHtmlPairs from "../rules/inlineHtmlPairs";
+import html from "../rules/html";
 
 export default class HTMLInline extends Node {
   get name() {
@@ -14,28 +14,16 @@ export default class HTMLInline extends Node {
       content: "text*",
       inline: true,
       atom: true,
-      attrs: {
-        content: {
-          default: "",
-        },
-      },
       parseDOM: [
         {
           tag: "span.html_inline",
-          getAttrs: (dom: HTMLDivElement) => ({
-            content: dom.dataset.content,
-          }),
         },
       ],
-      toDOM: node => [
-        "span",
-        { class: "html_inline", "data-content": node.attrs.content },
-        0,
-      ],
+      toDOM: () => ["span", { class: "html_inline" }, 0],
     };
   }
 
-  commands({ type /*, schema*/ }) {
+  commands({ type, schema }) {
     return attrs => (
       state: EditorState,
       dispatch?: (tr: Transaction) => void
@@ -47,7 +35,7 @@ export default class HTMLInline extends Node {
         dispatch(
           state.tr
             .replaceSelectionWith(
-              type.create({ content: `<span>${text}</span>` }, null)
+              type.create(null, schema.text(`<span>${text}</span>`))
             )
             .scrollIntoView()
         );
@@ -71,12 +59,12 @@ export default class HTMLInline extends Node {
 
   // markdown-it 解析 markdown 时使用
   get rulePlugins() {
-    return [inlineHtmlPairs];
+    return [html];
   }
 
   // 序列化为 markdown 时使用
   toMarkdown(state, node) {
-    state.text(node.attrs.content, false);
+    state.text(node.textContent, false);
   }
 
   // 把 markdown-it 的解析结果转换成 node
@@ -85,13 +73,7 @@ export default class HTMLInline extends Node {
       // prosemirror-markdown 中 tokenHandlers 函数
       // 会根据 token 的类型生成 tokenHandler，
       // 类型有: block/node/mark/ignore.
-      node: "html_inline",
-      getAttrs: token => {
-        const content = token.content;
-        return {
-          content,
-        };
-      },
+      block: "html_inline",
     };
   }
 }

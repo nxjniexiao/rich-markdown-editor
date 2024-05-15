@@ -242,16 +242,18 @@ function handleSetBlockType(view: EditorView, onClose: () => void) {
     if (type === schema.nodes.blockquote) {
       wrapIn(type, this.attrs)(view.state, view.dispatch);
     } else if (type === schema.nodes.html_block) {
-      view.dispatch(
-        view.state.tr
-          .replaceSelectionWith(
-            type.create(
-              { content: `<div>\n${selection.node.textContent}\n</div>` },
-              null
-            )
-          )
-          .scrollIntoView()
+      const node = type.create(
+        null,
+        schema.text(`<div>\n${selection.node.textContent || "..."}\n</div>`)
       );
+      let tr = view.state.tr.replaceSelectionWith(node);
+      tr = tr.setSelection(
+        NodeSelection.create(
+          tr.doc,
+          tr.selection.$from.before() - node.nodeSize
+        )
+      );
+      view.dispatch(tr.scrollIntoView());
     } else {
       setBlockType(type, this.attrs)(view.state, view.dispatch);
     }

@@ -19,39 +19,34 @@ export default class HTMLBlock extends Node {
       inline: false,
       atom: true,
       code: true,
-      attrs: {
-        content: {
-          default: "",
-        },
-      },
       parseDOM: [
         {
           tag: "div.html_block",
-          getAttrs: (dom: HTMLDivElement) => ({
-            content: dom.dataset.content,
-          }),
         },
       ],
-      toDOM: node => [
-        "div",
-        { class: "html_block", "data-content": node.attrs.content },
-        0,
-      ],
+      toDOM: () => ["div", { class: "html_block" }, 0],
     };
   }
 
-  commands({ type /*, schema*/ }) {
+  commands({ type, schema }) {
     return attrs => (
       state: EditorState,
       dispatch?: (tr: Transaction) => void
     ) => {
       if (dispatch) {
+        const node = state.doc.cut(state.selection.from, state.selection.to);
+        const text = node.textContent;
         let tr = state.tr;
-        tr = tr.replaceSelectionWith(
-          type.create({ content: `<div>\n...\n</div>` })
+        const newNode = type.create(
+          null,
+          schema.text(`<div>\n${text || "..."}\n</div>`)
         );
+        tr = tr.replaceSelectionWith(newNode);
         tr = tr.setSelection(
-          NodeSelection.create(tr.doc, tr.selection.$from.before() - 2)
+          NodeSelection.create(
+            tr.doc,
+            tr.selection.$from.before() - newNode.nodeSize
+          )
         );
         dispatch(tr);
       }
@@ -75,7 +70,7 @@ export default class HTMLBlock extends Node {
   // 序列化为 markdown 时使用
   toMarkdown(state, node) {
     state.ensureNewLine();
-    state.text(node.attrs.content, false);
+    state.text(node.textContent, false);
     state.write("\n\n");
   }
 
@@ -85,13 +80,7 @@ export default class HTMLBlock extends Node {
       // prosemirror-markdown 中 tokenHandlers 函数
       // 会根据 token 的类型生成 tokenHandler，
       // 类型有: block/node/mark/ignore.
-      node: "html_block",
-      getAttrs: token => {
-        const content = token.content.replace(/\n$/, "");
-        return {
-          content,
-        };
-      },
+      block: "html_block",
     };
   }
 }

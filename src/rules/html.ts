@@ -27,9 +27,25 @@ const validInlineHtmlPairsSet = new Set(validInlineHtmlPairs);
 const INLINE_HTML_REGEX_START = /^<(\w+)[\s>]/;
 const INLINE_HTML_REGEX_END = /^<\/(\w+)>/;
 
-export default function inlineHtmlPairs(md: MarkdownIt): void {
+export default function html(md: MarkdownIt): void {
+  // post-processing for block html
+  md.core.ruler.after("block", "blockHtml", state => {
+    const tokens = state.tokens;
+    let i = tokens.length;
+    while (i--) {
+      const token = tokens[i];
+      if (token.type === "html_block") {
+        const openToken = new Token("html_block_open", "", 1);
+        const textToken = new Token("text", "", 0);
+        const closeToken = new Token("html_block_close", "", -1);
+        textToken.content = token.content;
+        tokens.splice(i, 1, openToken, textToken, closeToken);
+      }
+    }
+  });
+
   // post-processing for inline html pairs
-  md.inline.ruler2.after("emphasis", "inlineHtmlPairs", state => {
+  md.inline.ruler2.after("emphasis", "inlineHtml", state => {
     const tokens = state.tokens;
     const max = tokens.length;
     const validInlineHtmlTokenObj: { [tag: string]: number[] } = {};
@@ -108,15 +124,24 @@ export default function inlineHtmlPairs(md: MarkdownIt): void {
           token.type = "text";
           continue;
         }
-        token.nesting = 0;
         const endTokenIdx = findEndTokenIdx(token.tag, i);
         if (endTokenIdx === null) {
+          token.nesting = 0;
           token.type = "text";
         } else {
-          for (let j = i + 1; j <= endTokenIdx; j++) {
-            const content = tokens[j].content || tokens[j].markup;
-            token.content += content;
+          token.type = "html_inline_open";
+          let content = "";
+          for (let j = i; j <= endTokenIdx; j++) {
+            content += tokens[j].content || tokens[j].markup;
           }
+          if (content) {
+            const textToken = new Token("text", "", 0);
+            textToken.content = content;
+            newTokens.push(textToken);
+          }
+          const endToken = tokens[endTokenIdx];
+          endToken.type = "html_inline_close";
+          newTokens.push(endToken);
           i = endTokenIdx;
         }
       }
