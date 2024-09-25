@@ -14,6 +14,8 @@ import {
   HighlightIcon,
   MathIcon,
   ItalicIcon,
+  TableIcon,
+  BackIcon,
 } from "outline-icons";
 import { isInTable } from "prosemirror-tables";
 import { EditorState } from "prosemirror-state";
@@ -33,6 +35,29 @@ export default function formattingMenuItems(
   const isTable = isInTable(state);
   const isList = isInList(state);
   const allowBlocks = !isTable && !isList;
+  const allowMergeCells = isTable;
+  const allowSplitCell = isTable;
+
+  let tableCellsOp: MenuItem[] = [];
+  if (allowMergeCells || allowMergeCells) {
+    tableCellsOp = [
+      {
+        name: "separator",
+      },
+      {
+        name: "merge_cells",
+        tooltip: dictionary.mergeCells,
+        icon: TableIcon,
+        visible: allowMergeCells,
+      },
+      {
+        name: "split_cell",
+        tooltip: dictionary.splitCell,
+        icon: TableIcon,
+        visible: allowSplitCell,
+      },
+    ];
+  }
 
   return [
     {
@@ -88,6 +113,12 @@ export default function formattingMenuItems(
       tooltip: dictionary.equation,
       icon: MathIcon,
       active: isNodeActive(schema.nodes.inline_math),
+    },
+    {
+      name: "html_inline",
+      tooltip: dictionary.html,
+      icon: BackIcon, // NextIcon
+      active: isNodeActive(schema.nodes.inline_html),
     },
     {
       name: "separator",
@@ -161,5 +192,6 @@ export default function formattingMenuItems(
       active: isMarkActive(schema.marks.link),
       attrs: { href: "" },
     },
+    ...tableCellsOp,
   ];
 }

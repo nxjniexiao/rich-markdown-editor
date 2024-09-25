@@ -58,6 +58,8 @@ import TableHeadCell from "./nodes/TableHeadCell";
 import TableRow from "./nodes/TableRow";
 import MathInline from "./nodes/MathInline";
 import MathBlock from "./nodes/MathBlock";
+import HTMLBlock from "./nodes/HTMLBlock";
+import HTMLInline from "./nodes/HTMLInline";
 
 // marks
 import Bold from "./marks/Bold";
@@ -127,6 +129,7 @@ export type Props = {
     | "th"
     | "tr"
     | "emoji"
+    | "folding"
   )[];
   autoFocus?: boolean;
   readOnly?: boolean;
@@ -301,6 +304,10 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
     }
   }
 
+  componentWillUnmount(): void {
+    this.view.destroy();
+  }
+
   init() {
     this.extensions = this.createExtensions();
     this.nodes = this.createNodes();
@@ -351,6 +358,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
             dictionary,
             onShowToast: this.props.onShowToast,
             offset: this.props.headingsOffset,
+            disableFolding: this.props.disableExtensions?.includes("folding"),
           }),
           new HorizontalRule(),
           new Image({
@@ -376,6 +384,8 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           new Highlight(),
           new MathBlock(),
           new MathInline(),
+          new HTMLBlock(),
+          new HTMLInline(),
           new Italic(),
           new TemplatePlaceholder(),
           new Underline(),
@@ -509,6 +519,7 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
   createParser() {
     return this.extensions.parser({
       schema: this.schema,
+      rules: { html: true },
       plugins: this.rulePlugins,
     });
   }
@@ -569,6 +580,10 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
           transaction
         );
 
+        const hasIMEPlugin = state.plugins.some(
+          plugin => plugin.key.indexOf("ime") > -1
+        );
+
         this.updateState(state);
 
         // If any of the transactions being dispatched resulted in the doc
@@ -581,6 +596,13 @@ class RichMarkdownEditor extends React.PureComponent<Props, State> {
               transactions.some(isEditingCheckbox)))
         ) {
           if (!self.view) self.view = this; // fix: throw err when init a doc with folded content, as this.view is undefined.
+          // Doesn't trigger handleChange when composing
+          if (!(hasIMEPlugin && this.composing)) {
+            self.handleChange();
+          }
+        }
+        // Trigger handleChange when compositionend
+        if (hasIMEPlugin && transaction.getMeta("compositionend")) {
           self.handleChange();
         }
 

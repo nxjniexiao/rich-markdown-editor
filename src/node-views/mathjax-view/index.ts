@@ -9,9 +9,9 @@ import {
   deleteSelection,
   newlineInCode,
 } from "prosemirror-commands";
+import { renderMath2SVG } from "./render-math-2-svg";
 import { GetPos, isMacOS } from "./types";
 
-import "katex/dist/katex.css";
 import "./style.css";
 
 export async function renderMath(
@@ -19,24 +19,9 @@ export async function renderMath(
   element: HTMLElement,
   inline: boolean
 ) {
-  // TODO: Change this to a Text call that includes the document, allows inclusion of displays! :)
-  // const txt = toText(this.node, this.outerView.state.schema, document);
-  // console.log({ math, txt });
-  // const render = math.replace(/−/g, '-');
-  const render = math?.trim() || "...";
-  try {
-    const katex = await import("katex");
-    katex.default.render(render, element, {
-      displayMode: !inline,
-      throwOnError: false,
-      macros: {
-        "\\boldsymbol": "\\mathbf",
-      },
-    });
-  } catch (error) {
-    // eslint-disable-next-line no-param-reassign
-    element.innerText = error as string;
-  }
+  const content = math?.trim() || "...";
+  const text = renderMath2SVG(content, inline);
+  element.innerHTML = text;
 }
 
 export class MathView implements NodeView {

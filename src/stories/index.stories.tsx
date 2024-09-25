@@ -3,6 +3,13 @@ import debounce from "lodash/debounce";
 import { Props } from "..";
 import React from "react";
 import { Story, Meta } from "@storybook/react/types-6-0";
+import Attach from "./external-extensions/attachment/attachment-node";
+import BlockAttach from "./external-extensions/block-attachment/block-attachment-node";
+import literatureReference from "./external-extensions/literature-reference/reference-node";
+import literatureReferenceItem from "./external-extensions/literature-reference/reference-item-node";
+import Ref from "./external-extensions/literature-reference/ref-node";
+import OnLoad from "./external-extensions/on-load";
+import IME from "./external-extensions/ime";
 
 export default {
   title: "Editor",
@@ -34,36 +41,213 @@ Default.args = {
 Just an easy to use **Markdown** editor with \`slash commands\``,
 };
 
+export const HTML = Template.bind({});
+HTML.args = {
+  defaultValue: `# HTML
+
+## HTML block
+
+<div>
+  <div>123</div>
+  <div style="color:skyblue;">456</div>
+</div>
+
+## HTML inline
+
+This span is <span style="background:skyblue">an <span style="border:1px solid red">inline-level</span> element</span>; its background 
+has been <span style="background:skyblue">colored</span> to <span style="color: tomato">display</span> both the beginning and
+<em>end <span style="border: 1px solid #ccc;"> of **the** element's</span> influence</strong>.
+`,
+};
+
+export const DisableFolding = Template.bind({});
+DisableFolding.args = {
+  disableExtensions: ["folding"],
+  defaultValue: `# Disable folding
+
+Just an easy to use **Markdown** editor with \`slash commands\``,
+};
+
+export const InputMethod = Template.bind({});
+InputMethod.args = {
+  extensions: [new IME()],
+  defaultValue: `# IME
+
+onChange should not be triggered within a composition session`,
+};
+
+export const Reference = Template.bind({});
+Reference.args = {
+  readOnly: true,
+  onClickLink: (href: string) => {
+    let openInNewTab = true;
+    try {
+      const url = new URL(href);
+      if (url.hash.startsWith("#literature")) {
+        openInNewTab = false;
+      }
+    } catch (_) {}
+    openInNewTab ? window.open(href, "_blank") : (window.location.href = href);
+  },
+  extensions: [
+    new literatureReference(),
+    new literatureReferenceItem(),
+    new Ref(),
+  ],
+  defaultValue: `
+# Content
+
+XXXXXXXXXXXXXXX1<ref name="Miller"/><ref name="Davis"/> XXXXXXXXXXXXXXX2<ref name="Miller"/>。
+
+1
+
+2
+
+XXXXXXXXXXXXXXX3<ref name="Miller"/> X2<ref name="Davis"/>
+
+3
+
+4
+
+5
+
+XXXXXXXXXXXXXXX4<ref name="Miller"/> X3<ref name="Davis"/>
+
+6
+
+7
+
+8
+
+9
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<ref name="Dietzenbacher:Data"/>。
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+## References
+
+<references>
+<ref name="Miller"> Miller, R., & Blair, P. (2009). Input–output analysis: Foundations and extensions (2nd ed.). Cambridge, UK: Cambridge University Press.</ref>
+<ref name="Davis"> Davis S. & Caldeira K. (2010). Consumption-based accounting of CO2 emmissions. PNAS 107(12):5687-5692.</ref>
+<ref name="Dietzenbacher:Data"> Arnold Tukker & Erik Dietzenbacher (2013) GLOBAL MULTIREGIONAL INPUT–OUTPUT FRAMEWORKS: AN INTRODUCTION AND OUTLOOK, Economic Systems Research, 25:1, 1-19, DOI: 10.1080/09535314.2012.761179 </ref>
+</references>
+  `,
+};
+
+export const BlockAttachment = Template.bind({});
+BlockAttachment.args = {
+  extensions: [new BlockAttach()],
+  defaultValue: `
+# Custom Block Attachment
+
+Block Attachment
+{{block: 9379ed9e-89f1-4196-8280-0881891d8ce8}}
+
+Attachment 2
+
+{{block: df53cf6b-eaa9-4f4e-a875-89981f4e1a12}}
+
+Attachment 3 with height
+
+{{block: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|auto|100px}}
+
+Attachment 4 with width
+
+{{block: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|150.5px|100px}}
+`,
+};
+
+export const Attachment = Template.bind({});
+Attachment.args = {
+  extensions: [new Attach()],
+  defaultValue: `
+# Custom Inline Attachment
+
+Test support for attachments[[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]. New rules should not affect links[a link](http://www.getoutline.com)。
+
+Shouldn't Parse Successful Case Tests:
+
+- wrong key word [[test: 123-abc]]
+- un-closed [[attach: 123-abc
+- extra space [[ attach: 123-abc]]
+- extra space [[attach: 123-abc ]]
+- wrong id [[attach: 中文]]
+`,
+};
+
+export const OnLoadProps = Template.bind({});
+OnLoadProps.args = {
+  extensions: [
+    new Attach(),
+    new OnLoad({
+      onLoad: () => {
+        const root = document.querySelector("#root");
+        console.log(
+          `width: ${root?.offsetWidth}; height: ${root?.offsetHeight}`
+        );
+      },
+    }),
+  ],
+  defaultValue: `# OnLoad
+
+Attachment [[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]。
+
+![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg)
+
+when $a \\ne 0$, $(ax^2 + bx + c = 0)$ has two solutions, which are：
+
+$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$
+
+`,
+};
+
 export const Color = Template.bind({});
 Color.args = {
   defaultValue: `
 # Color
 
-测试特殊情况：[<<rgb(240, 107, 5) 颜色>>，[<<<rgba(163, 67, 31, 0.2) 背景色>>> 。
+Special case：[<<rgb(240, 107, 5) Color>>，[<<<rgba(163, 67, 31, 0.2) Background Color>>> 。
 
-<<rgb(240, 107, 5) <<<rgba(163, 67, 31, 0.2) **测试**>>>>><<rgb(136, 49, 204) <<<rgba(74, 82, 199, 0.2) ~~文字~~>>>>><<rgb(233, 30, 44) <<<rgba(200, 21, 182, 0.2) *背景*>>>>><<rgb(3, 135, 102) <<<rgba(3, 135, 102, 0.2) 颜色>>>>>
+<<rgb(240, 107, 5) <<<rgba(163, 67, 31, 0.2) **Test**>>>>><<rgb(136, 49, 204) <<<rgba(74, 82, 199, 0.2) ~~Text~~>>>>><<rgb(233, 30, 44) <<<rgba(200, 21, 182, 0.2) *Background*>>>>><<rgb(3, 135, 102) <<<rgba(3, 135, 102, 0.2) Color>>>>>
 `,
 };
 
 export const Math = Template.bind({});
 Math.args = {
   defaultValue: `
-# 公式
+# Math
 
-行内公式 $a^2+b^2=c^2$ ，其中 $ 后面跟数字不能被识别为公式，如：$1.99。
+Inline math $a^2+b^2=c^2$ ，where $ followed by a number cannot be recognized as a formula, eg：$1.99。
 
-当 $a \\ne 0$ 时，$(ax^2 + bx + c = 0)$ 有两个解，它们是：
+when $a \\ne 0$ 时，$(ax^2 + bx + c = 0)$ has two solutions, which are：
 
 $$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$
 
 $$a \\ne 0$$
 
-公式内包含换行符：
+Line breaks are included in the formula:
 
 $$x = {-b 
 \\pm 
 \\sqrt
-{b^2-4ac} \\over 2a}$$
+{b^2-4ac} \\over 2a}\\text{文字}$$
 `,
 };
 
@@ -156,8 +340,54 @@ Simple tables with alignment and row/col editing are supported, they can be inse
 | Editor      | Rank | React | Collaborative |
 |-------------|------|-------|--------------:|
 | Prosemirror | A    |   No  |           Yes |
-| Slate       | B    |  Yes  |            No |
+| Slate       | B    |  Yes  |     No \\n No |
 | CKEdit      | C    |   No  |           Yes |
+`,
+};
+
+export const TablesWithMergedCells = Template.bind({});
+TablesWithMergedCells.args = {
+  defaultValue: `# Tables with merged cells
+
+## Multiple columns spanned, without leading pipes
+
+|               |          Grouping           ||
+| First Header  | Second Header | Third Header |
+| ------------- | :-----------: | -----------: |
+| Content       |          *Long Cell*        ||
+| Content       |   **Cell**    |         Cell |
+
+## Empty table cells at headers and data rows
+
+|             |                             ||
+|             | Second Header | Third Header |
+| ----------- | :-----------: | -----------: |
+| Content     |                             ||
+|             |               |         Cell |
+
+## Rowspan and colspan in one table cell
+
+| A                |||
+|------|------|------|
+| B    | C    | D    |
+| ^^   | E    | F    |
+| G          || H    |
+| ^^         || I    |
+| ^^         || J    |
+
+## Rowspan and colspan in one table cell base case
+
+|    |    |    |
+|----|----|----|
+| A  | B      ||
+| C  | ^^     ||
+
+## Rowspan at first line
+
+| ^^   | A    | B    |
+|------|------|------|
+| ^^   | C    | D    |
+| ^^   | E    | F    |
 `,
 };
 

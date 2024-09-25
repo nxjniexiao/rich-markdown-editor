@@ -998,6 +998,16 @@ export const StyledEditor = styled("div")<{
     display: block;
   }
 
+  .widget-ref,
+  .widget-reference {
+    .link {
+      margin-left: 4px;
+    }
+    a {
+      text-decoration: none;
+    }
+  }
+
   @media print {
     .placeholder:before,
     .block-menu-trigger,

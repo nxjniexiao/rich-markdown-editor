@@ -87,8 +87,8 @@ export default class ComponentView {
     }
   }
 
-  stopEvent() {
-    return true;
+  stopEvent(event) {
+    return this.extension.stopEvent(event);
   }
 
   destroy() {

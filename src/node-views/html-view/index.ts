@@ -9,42 +9,17 @@ import {
   deleteSelection,
   newlineInCode,
 } from "prosemirror-commands";
+import { sanitizeBlockHtml, sanitizeInlineHtml } from "./sanitize-html";
 import { GetPos, isMacOS } from "./types";
 
-import "katex/dist/katex.css";
 import "./style.css";
 
-export async function renderMath(
-  math: string,
-  element: HTMLElement,
-  inline: boolean
-) {
-  // TODO: Change this to a Text call that includes the document, allows inclusion of displays! :)
-  // const txt = toText(this.node, this.outerView.state.schema, document);
-  // console.log({ math, txt });
-  // const render = math.replace(/−/g, '-');
-  const render = math?.trim() || "...";
-  try {
-    const katex = await import("katex");
-    katex.default.render(render, element, {
-      displayMode: !inline,
-      throwOnError: false,
-      macros: {
-        "\\boldsymbol": "\\mathbf",
-      },
-    });
-  } catch (error) {
-    // eslint-disable-next-line no-param-reassign
-    element.innerText = error as string;
-  }
-}
-
-export class MathView implements NodeView {
+export class HTMLView implements NodeView {
   dom: HTMLElement;
 
-  mathEditor: HTMLElement;
+  htmlEditor: HTMLElement;
 
-  mathContent: HTMLElement;
+  htmlContent: HTMLElement;
 
   inline: boolean;
 
@@ -62,34 +37,31 @@ export class MathView implements NodeView {
     this.outerView = view;
     this.getPos = getPos;
     this.dom = document.createElement(inline ? "span" : "div");
-    this.dom.classList.add("math");
+    this.dom.classList.add("html");
     this.handleDocumentClick = this.handleDocumentClick.bind(this);
 
-    this.mathEditor = document.createElement(inline ? "span" : "div");
-    this.mathEditor.classList.add("math-editor");
-    this.mathContent = document.createElement(inline ? "span" : "div");
-    this.mathContent.classList.add("math-content");
-    this.mathContent.addEventListener("click", () => {
+    this.htmlEditor = document.createElement(inline ? "span" : "div");
+    this.htmlEditor.classList.add("html-editor");
+    this.htmlContent = document.createElement(inline ? "span" : "div");
+    this.htmlContent.classList.add("html-content");
+    this.htmlContent.addEventListener("click", () => {
       if (!view.editable) return;
       this.select();
     });
-    this.dom.appendChild(this.mathEditor);
-    this.dom.appendChild(this.mathContent);
+    this.dom.appendChild(this.htmlEditor);
+    this.dom.appendChild(this.htmlContent);
     this.inline = inline;
 
     if (this.inline) {
       this.dom.classList.add("inline");
-      this.mathEditor.classList.add("inline");
+      this.htmlEditor.classList.add("inline");
     } else {
       this.dom.classList.add("display");
     }
 
     this.addFakeCursor();
     this.dom.classList.remove("editing");
-    this.renderMath();
-    requestAnimationFrame(() => {
-      view.dispatch(view.state.tr.setMeta("load-math", { pos: getPos() }));
-    });
+    this.renderHTML();
 
     const unFocus = () => {
       this.dom.classList.remove("editing");
@@ -99,11 +71,12 @@ export class MathView implements NodeView {
 
     const mac = isMacOS();
 
+    const doc = this.node;
     this.innerView = new EditorView(
-      { mount: this.mathEditor },
+      { mount: this.htmlEditor },
       {
         state: EditorState.create({
-          doc: this.node,
+          doc,
           plugins: [
             keymap({
               "Mod-a": () => {
@@ -187,7 +160,7 @@ export class MathView implements NodeView {
         );
       }
     }
-    this.renderMath();
+    this.renderHTML();
     return true;
   }
 
@@ -209,8 +182,12 @@ export class MathView implements NodeView {
     }
   }
 
-  renderMath() {
-    renderMath(this.node.textContent, this.mathContent, this.inline);
+  renderHTML() {
+    const content = this.node.textContent || "...";
+    const safeContent = this.inline
+      ? sanitizeInlineHtml(content)
+      : sanitizeBlockHtml(content);
+    this.htmlContent.innerHTML = safeContent;
   }
 
   destroy() {
@@ -231,7 +208,7 @@ export class MathView implements NodeView {
   addFakeCursor() {
     if (!this.inline) return;
     const hasContent = this.node.textContent.length > 0;
-    this.mathEditor.classList[hasContent ? "remove" : "add"]("empty");
+    this.htmlEditor.classList[hasContent ? "remove" : "add"]("empty");
   }
 
   select() {
@@ -250,8 +227,8 @@ export class MathView implements NodeView {
 
   handleDocumentClick(event) {
     const target = event.target;
-    const mathDom = target?.closest(".math");
-    if (mathDom === this.dom) return;
+    const htmlDom = target?.closest(".html");
+    if (htmlDom === this.dom) return;
     this.deselect();
   }
 }

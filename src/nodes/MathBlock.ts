@@ -3,8 +3,8 @@ import { setBlockType } from "prosemirror-commands";
 import { InputRule } from "prosemirror-inputrules";
 import { changeNodeRule } from "../inputrules/utils";
 import isNodeActive from "../queries/isNodeActive";
-import { MathView } from "../node-views/math-view";
-import MathRule from "../rules/katex";
+import { MathView } from "../node-views/mathjax-view";
+import MathRule from "../rules/mathjax";
 import Node from "./Node";
 
 export default class InlineMath extends Node {

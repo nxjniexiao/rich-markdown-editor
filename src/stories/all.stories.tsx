@@ -1,3 +1,4 @@
+/*
 import Editor from "./index";
 import { Props } from "..";
 import React from "react";
@@ -35,3 +36,4 @@ All.args.defaultValue = Object.keys(stories).reduce((prev, name) => {
   // eslint-disable-next-line import/namespace
   return (prev += stories[name].args.defaultValue + "\n");
 }, "");
+*/
