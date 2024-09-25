@@ -14,7 +14,7 @@ export default class Attachment extends Node {
       atom: true,
       attrs: {
         type: {
-          default: "", // cmap
+          default: "", // block
         },
         id: {
           default: "", // block attachment id

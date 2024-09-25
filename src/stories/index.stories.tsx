@@ -73,7 +73,7 @@ InputMethod.args = {
   extensions: [new IME()],
   defaultValue: `# IME
 
-试用输入法输入时不触发onChange。`,
+onChange should not be triggered within a composition session`,
 };
 
 export const Reference = Template.bind({});
@@ -95,15 +95,15 @@ Reference.args = {
     new Ref(),
   ],
   defaultValue: `
-# 文献引用
+# Content
 
-原始的投入产出分析1<ref name="Miller"/><ref name="Davis"/> 是用于分析经济产品2<ref name="Miller"/>。
+XXXXXXXXXXXXXXX1<ref name="Miller"/><ref name="Davis"/> XXXXXXXXXXXXXXX2<ref name="Miller"/>。
 
 1
 
 2
 
-原始的投入产出分析3<ref name="Miller"/> 是2<ref name="Davis"/>
+XXXXXXXXXXXXXXX3<ref name="Miller"/> X2<ref name="Davis"/>
 
 3
 
@@ -111,7 +111,7 @@ Reference.args = {
 
 5
 
-原始的投入产出分析4<ref name="Miller"/> 是3<ref name="Davis"/>
+XXXXXXXXXXXXXXX4<ref name="Miller"/> X3<ref name="Davis"/>
 
 6
 
@@ -121,7 +121,7 @@ Reference.args = {
 
 9
 
-全球投入产出表，并且包含环境的数据，可以从这里获得进一步信息<ref name="Dietzenbacher:Data"/>。
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<ref name="Dietzenbacher:Data"/>。
 
 1
 
@@ -141,7 +141,7 @@ Reference.args = {
 
 9
 
-## 参考文献
+## References
 
 <references>
 <ref name="Miller"> Miller, R., & Blair, P. (2009). Input–output analysis: Foundations and extensions (2nd ed.). Cambridge, UK: Cambridge University Press.</ref>
@@ -155,22 +155,22 @@ export const BlockAttachment = Template.bind({});
 BlockAttachment.args = {
   extensions: [new BlockAttach()],
   defaultValue: `
-# 自定义块级附件
+# Custom Block Attachment
 
-块级附件
-{{cmap: 9379ed9e-89f1-4196-8280-0881891d8ce8}}
+Block Attachment
+{{block: 9379ed9e-89f1-4196-8280-0881891d8ce8}}
 
-附件2
+Attachment 2
 
-{{cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12}}
+{{block: df53cf6b-eaa9-4f4e-a875-89981f4e1a12}}
 
-附件3 有高度
+Attachment 3 with height
 
-{{cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|auto|100px}}
+{{block: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|auto|100px}}
 
-附件3 有宽高
+Attachment 4 with width
 
-{{cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|150.5px|100px}}
+{{block: df53cf6b-eaa9-4f4e-a875-89981f4e1a12|150.5px|100px}}
 `,
 };
 
@@ -178,17 +178,17 @@ export const Attachment = Template.bind({});
 Attachment.args = {
   extensions: [new Attach()],
   defaultValue: `
-# 自定义附件
+# Custom Inline Attachment
 
-测试对附件的支持[[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]，对cmap的支持[[cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12]]，以及词条的支持[[[word: b516f615-00ca-4e4d-b24d-1d44179d3167]]。新增加的解析规则不应影响链接[a link](http://www.getoutline.com)。
+Test support for attachments[[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]. New rules should not affect links[a link](http://www.getoutline.com)。
 
-不应该解析成功的案例测试:
+Shouldn't Parse Successful Case Tests:
 
-- 类型错误 [[test: 123-abc]]
-- 未关闭 [[attach: 123-abc
-- 多余空格 [[ attach: 123-abc]]
-- 多余空格 [[attach: 123-abc ]]
-- ID为中文 [[attach: 中文]]
+- wrong key word [[test: 123-abc]]
+- un-closed [[attach: 123-abc
+- extra space [[ attach: 123-abc]]
+- extra space [[attach: 123-abc ]]
+- wrong id [[attach: 中文]]
 `,
 };
 
@@ -207,11 +207,11 @@ OnLoadProps.args = {
   ],
   defaultValue: `# OnLoad
 
-附件[[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]，cmap[[cmap: df53cf6b-eaa9-4f4e-a875-89981f4e1a12]]，词条[[word: b516f615-00ca-4e4d-b24d-1d44179d3167]]。
+Attachment [[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]]]。
 
 ![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg)
 
-当 $a \\ne 0$ 时，$(ax^2 + bx + c = 0)$ 有两个解，它们是：
+when $a \\ne 0$, $(ax^2 + bx + c = 0)$ has two solutions, which are：
 
 $$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$
 
@@ -223,26 +223,26 @@ Color.args = {
   defaultValue: `
 # Color
 
-测试特殊情况：[<<rgb(240, 107, 5) 颜色>>，[<<<rgba(163, 67, 31, 0.2) 背景色>>> 。
+Special case：[<<rgb(240, 107, 5) Color>>，[<<<rgba(163, 67, 31, 0.2) Background Color>>> 。
 
-<<rgb(240, 107, 5) <<<rgba(163, 67, 31, 0.2) **测试**>>>>><<rgb(136, 49, 204) <<<rgba(74, 82, 199, 0.2) ~~文字~~>>>>><<rgb(233, 30, 44) <<<rgba(200, 21, 182, 0.2) *背景*>>>>><<rgb(3, 135, 102) <<<rgba(3, 135, 102, 0.2) 颜色>>>>>
+<<rgb(240, 107, 5) <<<rgba(163, 67, 31, 0.2) **Test**>>>>><<rgb(136, 49, 204) <<<rgba(74, 82, 199, 0.2) ~~Text~~>>>>><<rgb(233, 30, 44) <<<rgba(200, 21, 182, 0.2) *Background*>>>>><<rgb(3, 135, 102) <<<rgba(3, 135, 102, 0.2) Color>>>>>
 `,
 };
 
 export const Math = Template.bind({});
 Math.args = {
   defaultValue: `
-# 公式
+# Math
 
-行内公式 $a^2+b^2=c^2$ ，其中 $ 后面跟数字不能被识别为公式，如：$1.99。
+Inline math $a^2+b^2=c^2$ ，where $ followed by a number cannot be recognized as a formula, eg：$1.99。
 
-当 $a \\ne 0$ 时，$(ax^2 + bx + c = 0)$ 有两个解，它们是：
+when $a \\ne 0$ 时，$(ax^2 + bx + c = 0)$ has two solutions, which are：
 
 $$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$
 
 $$a \\ne 0$$
 
-公式内包含换行符：
+Line breaks are included in the formula:
 
 $$x = {-b 
 \\pm 

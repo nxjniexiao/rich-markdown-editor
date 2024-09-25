@@ -1,6 +1,6 @@
 import MarkdownIt from "markdown-it";
 
-const BLOCK_ATTACHMENT_REGEX = /^\{\{(cmap):\s?([0-9a-f\-]*)([A-Za-z0-9\.\|]+)?\}\}/;
+const BLOCK_ATTACHMENT_REGEX = /^\{\{(block):\s?([0-9a-f\-]*)([A-Za-z0-9\.\|]+)?\}\}/;
 
 export default function markdownItBlockAttachment(md: MarkdownIt): void {
   function renderAttachment(tokens, idx) {

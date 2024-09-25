@@ -1,6 +1,6 @@
 import MarkdownIt from "markdown-it";
 
-const ATTACHMENT_REGEX = /^\[\[(attach|cmap|word): ([0-9a-f\-]*)\]\]/;
+const ATTACHMENT_REGEX = /^\[\[(attach|attachment): ([0-9a-f\-]*)\]\]/;
 
 export default function markdownItAttachment(md: MarkdownIt): void {
   function renderAttachment(tokens, idx) {

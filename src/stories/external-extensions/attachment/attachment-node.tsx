@@ -16,7 +16,7 @@ export default class Attachment extends Node {
       selectable: false,
       attrs: {
         type: {
-          default: "", // cmap | word | attach
+          default: "", // attach
         },
         id: {
           default: "", // attachment id
