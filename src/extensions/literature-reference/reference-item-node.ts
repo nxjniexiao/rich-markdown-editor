@@ -1,4 +1,4 @@
-import Node from "../../../nodes/Node";
+import Node from "../../nodes/Node";
 import markdownItBlockLiteratureReference from "./reference-rule";
 
 export default class literatureReferenceItem extends Node {

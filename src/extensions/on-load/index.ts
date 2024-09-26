@@ -1,5 +1,5 @@
 import { Plugin } from "prosemirror-state";
-import Extension from "../../../lib/Extension";
+import Extension from "../../lib/Extension";
 
 export default class OnLoad extends Extension {
   get name() {

@@ -1,6 +1,6 @@
 import { Plugin } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
-import Node from "../../../nodes/Node";
+import Node from "../../nodes/Node";
 import markdownItRef from "./ref-rule";
 
 export default class Ref extends Node {

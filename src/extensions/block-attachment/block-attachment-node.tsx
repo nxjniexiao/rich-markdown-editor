@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import Node from "../../../nodes/Node";
+import Node from "../../nodes/Node";
 import markdownItBlockAttachment from "./block-attachment-rule";
 
 export default class Attachment extends Node {

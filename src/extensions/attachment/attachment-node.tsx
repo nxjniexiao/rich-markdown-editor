@@ -1,5 +1,5 @@
 import React from "react";
-import Node from "../../../nodes/Node";
+import Node from "../../nodes/Node";
 import markdownItAttachment from "./attachment-rule";
 
 export default class Attachment extends Node {

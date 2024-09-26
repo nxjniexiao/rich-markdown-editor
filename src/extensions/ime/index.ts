@@ -1,5 +1,5 @@
 import { Plugin, PluginKey } from "prosemirror-state";
-import Extension from "../../../lib/Extension";
+import Extension from "../../lib/Extension";
 
 export const imePluginKey = new PluginKey("ime");
 

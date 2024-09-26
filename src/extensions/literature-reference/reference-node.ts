@@ -1,4 +1,4 @@
-import Node from "../../../nodes/Node";
+import Node from "../../nodes/Node";
 
 export default class literatureReference extends Node {
   get name() {
