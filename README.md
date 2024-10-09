@@ -2,11 +2,31 @@
 
 Forked from [outline/rich-markdown-editor](https://github.com/outline/rich-markdown-editor).
 
-Enhance the outline/rich-markdown-editor by adding new features such as text color, LaTeX, merged table cells, and HTML. You can try a live demo [here](https://nxjniexiao.github.io/rich-markdown-editor/).
+Enhance the outline/rich-markdown-editor by adding new features such as **text color**, **LaTeX**, **merged table cells**, and **HTML**. You can try a live demo [here](https://nxjniexiao.github.io/rich-markdown-editor/).
+
+## Usage
+
+### Install
+
+```
+npm i rich-markdown-editor-enhanced
+```
+
+### Import
+
+```
+import Editor from 'rich-markdown-editor-enhanced';
+
+<Editor
+  defaultValue="Hello world!"
+/>
+```
 
 ## New Features
 
 ### Text Color and Background Color
+
+Support text color and text background color.
 
 - text color
   ```
@@ -19,6 +39,8 @@ Enhance the outline/rich-markdown-editor by adding new features such as text col
 
 ### Latex
 
+Support latex.
+
 ```
 When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are
 $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
@@ -26,7 +48,7 @@ $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
 
 ### HTML
 
-Support for html block and html inline.
+Support html block and html inline.
 
 ```
 ## HTML Block
@@ -45,7 +67,7 @@ has been <span style="background:skyblue">colored</span> to <span style="color: 
 
 ### Merged Table cells
 
-Support for merged table cells.
+Support merged table cells.
 
 ```
 # Tables with merged cells
@@ -59,52 +81,122 @@ Support for merged table cells.
 
 ### Disable Folding
 
-Support for disabling the folding.
+Support disabling the heading folding.
 
 ```
-{
-  disableExtensions: ["folding"]
-}
+import Editor from 'rich-markdown-editor-enhanced';
+
+<Editor 
+  disableExtensions=['folding']
+/>
 ```
 
-### IME (external plugin)
+### IME (extension)
 
-Doesn't trigger `onChange` when composing.
-
-### onLoad (external plugin)
-
-The onLoad will be triggered when all the images, formulas, etc. in the editor are loaded.
+The `onChange` will not be triggered while the input method is composing.
 
 ```
-new OnLoad({
-  onLoad: () => {
+import Editor from 'rich-markdown-editor-enhanced';
+import IME from 'rich-markdown-editor-enhanced/dist/extensions/ime';
+
+<Editor
+  defaultValue="Hello world!"
+  onChange={(getValue, getJson) => {
     //...
-  }
-});
+  }},
+  extensions={[
+    new IME(),
+  ]}
+/>
 ```
 
-### attachment (external plugin)
+### onLoad (extension)
+
+The `onLoad` will be triggered when all the images, formulas, etc. in the editor are loaded.
 
 ```
+import Editor from 'rich-markdown-editor-enhanced';
+import OnLoad from 'rich-markdown-editor-enhanced/dist/extensions/on-load';
+
+<Editor
+  defaultValue="Hello world!"
+  extensions={[
+    new OnLoad({
+      onLoad: () => {
+        //...
+      }
+    }),
+  ]}
+/>
+;
+```
+
+### attachment (extension)
+
+This extension is just an example showing how to customize nodes.
+
+How to use:
+
+```
+import Editor from 'rich-markdown-editor-enhanced';
+import Attach from 'rich-markdown-editor-enhanced/dist/extensions/attachment/attachment-node';
+import BlockAttach from 'rich-markdown-editor-enhanced/dist/extensions/block-attachment/block-attachment-node';
+
+<Editor
+  defaultValue="Hello world!"
+  extensions={[
+    new Attach(),
+    new BlockAttach(),
+  ]}
+/>
+;
+```
+
 The syntax of the attachment is as follows:
 
-[[attach: df53cf6b-......]]
+```
+A block level attachment is show as below:
 
-where `df53cf6b-......` is the attachment id.
+{{block: 9379ed9e-89f1-4196-8280-0881891d8ce8}}
 
-Next, we can modify the `component` method in `attachment-node` to define how this custom node is rendered, how it is updated, and how to respond to events.
+An inline level attachment is show as below:
+
+For details, see attach: [[attach: 9379ed9e-89f1-4196-8280-0881891d8ce8]].
 ```
 
-### Reference (external plugin)
+### Reference (extension)
+
+Support reference.
+
+How to use:
 
 ```
-## Content
+import Editor from 'rich-markdown-editor-enhanced';
+import literatureReference from 'rich-markdown-editor-enhanced/dist/extensions/literature-reference/reference-node';
+import literatureReferenceItem from 'rich-markdown-editor-enhanced/dist/extensions/literature-reference/reference-item-node';
+import Ref from 'rich-markdown-editor-enhanced/dist/extensions/literature-reference/ref-node';
+
+<Editor
+  defaultValue="Hello world!"
+  extensions={[
+    new literatureReference(),
+    new literatureReferenceItem(),
+    new Ref(),
+  ]}
+/>
+;
+```
+
+The syntax of reference is as follows:
+
+```
+#### Content
 
 The quick brown fox jumps over the lazy dog.<ref name="LazyDog"/>
 Amazingly few discotheques provide jukeboxes.<ref name="Jukeboxes"/>
 How razorback-jumping frogs can level six piqued gymnasts.<ref name="JumpingFrogs"/>
 
-## References
+#### References
 
 <references>
 <ref name="Jukeboxes">This is the jukeboxes reference.</ref>
