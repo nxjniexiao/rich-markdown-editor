@@ -2,6 +2,8 @@
 
 Forked from [outline/rich-markdown-editor](https://github.com/outline/rich-markdown-editor).
 
+You can try a live demo [here](https://nxjniexiao.github.io/rich-markdown-editor/).
+
 ## New Features
 
 ### Text Color and Background Color
